@@ -1,0 +1,16 @@
+[
+{
+  "modid": "amdiforge",
+  "name": "A.M.D.I Forge",
+  "description": "Forge Frontend for the AMDI ServerScript",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/GTNewHorizons/AMDIForge",
+  "updateUrl": "",
+  "authorList": ["Namikon"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
