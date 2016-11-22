@@ -21,11 +21,13 @@ package eu.usrv.amdiforge.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import eu.usrv.amdiforge.client.gui.GuiAMDI;
 import eu.usrv.yamcore.auxiliary.PlayerChatHelper;
 
 
@@ -36,7 +38,7 @@ public class AMDICommand implements ICommand
 	public AMDICommand()
 	{
 		this.aliases = new ArrayList();
-		this.aliases.add( "lbag" );
+		this.aliases.add( "amdi" );
 	}
 
 	@Override
@@ -48,7 +50,7 @@ public class AMDICommand implements ICommand
 	@Override
 	public String getCommandName()
 	{
-		return "lootbags";
+		return "amdiforge";
 	}
 
 	@Override
@@ -66,162 +68,154 @@ public class AMDICommand implements ICommand
 	@Override
 	public void processCommand( ICommandSender pCmdSender, String[] pArgs )
 	{
+		//Minecraft.getMinecraft().displayGuiScreen( new GuiAMDI( ((EntityPlayer)pCmdSender).inventory, pArgs[0] ) );
+		Minecraft.getMinecraft().displayGuiScreen( new GuiAMDI( ((EntityPlayer)pCmdSender).inventory, "/home/namikon/Git/AMDIForge/testgrave.dat" ) );
+		
 		/*
-		try
-		{
-			if( pArgs.length < 1 )
-			{
-				SendHelpToPlayer( pCmdSender );
-				return;
-			}
-			String tSubCommand = pArgs[0];
-
-			if( tSubCommand.equalsIgnoreCase( "reload" ) )
-			{
-				if( EnhancedLootBags.LootGroupHandler.reload() )
-					PlayerChatHelper.SendInfo( pCmdSender, String.format( "Reload successful" ) );
-				else
-					PlayerChatHelper.SendError( pCmdSender, String.format( "Reload successful" ) );
-
-				return;
-			}
-
-			LootGroupsFactory tLGF = new LootGroupsFactory();
-
-			if( !InGame( pCmdSender ) )
-			{
-				PlayerChatHelper.SendPlain( pCmdSender, "You have to execute this command ingame" );
-				return;
-			}
-
-			EntityPlayer tEp = (EntityPlayer) pCmdSender;
-			ItemStack inHand = null;
-			if( tEp != null )
-			{
-				inHand = tEp.getCurrentEquippedItem();
-				if( inHand == null )
-				{
-					PlayerChatHelper.SendPlain( pCmdSender, "Pickup an item first" );
-					return;
-				}
-			}
-
-			if( tSubCommand.equalsIgnoreCase( "addloot" ) || tSubCommand.equalsIgnoreCase( "addinventory" ) )
-			{
-				int tGroupID = Integer.parseInt( pArgs[1] );
-				int tAmount = 1;
-				int tChance = 100;
-				int tLimitedDropCount = 0;
-				int tRandomAmount = 0;
-
-				boolean tFlagsOK = true;
-				if( tGroupID < 0 || tGroupID > 32767 )
-					tFlagsOK = false;
-				if( pArgs.length == 6 )
-				{
-					tAmount = Integer.parseInt( pArgs[2] );
-					tChance = Integer.parseInt( pArgs[3] );
-					tLimitedDropCount = Integer.parseInt( pArgs[4] );
-					tRandomAmount = Integer.parseInt( pArgs[5] );
-
-					if( tAmount < 1 || tAmount > 64 )
-						tFlagsOK = false;
-					if( tChance < 1 || tChance > 255 )
-						tFlagsOK = false;
-					if( tLimitedDropCount < 0 || tChance > 255 )
-						tFlagsOK = false;
-					if( tRandomAmount < 0 || tRandomAmount > 1 )
-						tFlagsOK = false;
-				}
-				if( tFlagsOK )
-				{
-					LootGroup tGrp = EnhancedLootBags.LootGroupHandler.getGroupByID( tGroupID );
-					if( tGrp != null )
-					{
-						List<ItemStack> tStacksToAdd = new ArrayList<ItemStack>();
-						if( tSubCommand.equalsIgnoreCase( "addloot" ) )
-							tStacksToAdd.add( inHand.copy() );
-						else if( tSubCommand.equalsIgnoreCase( "addinventory" ) )
-						{
-							for( ItemStack is : tEp.inventory.mainInventory )
-								if( is != null )
-									tStacksToAdd.add( is.copy() );
-						}
-
-						for( ItemStack tis : tStacksToAdd )
-						{
-							String tItemID = ItemDescriptor.fromStack( tis ).toString();
-							if( tItemID.isEmpty() )
-								continue; // Something went wrong..
-
-							String tItemNBT = "";
-							if( tis.stackTagCompound != null )
-								tItemNBT = tis.stackTagCompound.toString();
-
-							Drop dr = tLGF.createDrop( tItemID, UUID.randomUUID().toString(), tItemNBT, tAmount, tRandomAmount == 1 ? true : false, tChance, tLimitedDropCount, "" );
-							tGrp.getDrops().add( dr );
-							EnhancedLootBags.LootGroupHandler.SaveLootGroups();
-							PlayerChatHelper.SendInfo( pCmdSender, String.format( "Item %s added to LootGroup ID %d ", tItemID, tGrp.getGroupID() ) );
-						}
-					}
-					else
-						PlayerChatHelper.SendError( pCmdSender, String.format( "LootGroup ID %d is unknown", tGroupID ) );
-				}
-				else
-					PlayerChatHelper.SendError( pCmdSender, String.format( "Some flags are wrong. Make sure to read the readme" ) );
-			}
-			else if( tSubCommand.equalsIgnoreCase( "addgroup" ) )
-			{
-				int tGroupID = Integer.parseInt( pArgs[1] );
-				String tGroupName = String.format( "Unnamed group %d", tGroupID );
-				EnumRarity tRarity = EnumRarity.common;
-				int tMinItems = 1;
-				int tMaxItems = 1;
-
-				boolean tFlagsOK = true;
-				if( tGroupID < 0 || tGroupID > 32767 )
-					tFlagsOK = false; // Just to be sure...
-				if( pArgs.length == 5 )
-				{
-					int tIntRarity = Integer.parseInt( pArgs[2] );
-					tMinItems = Integer.parseInt( pArgs[3] );
-					tMaxItems = Integer.parseInt( pArgs[4] );
-
-					if( tMinItems > tMaxItems )
-						tFlagsOK = false;
-					if( tMinItems < 1 || tMaxItems < 1 )
-						tFlagsOK = false;
-					if( tIntRarity < 0 || tIntRarity >= EnumRarity.values().length )
-						tFlagsOK = false;
-					else
-						tRarity = EnumRarity.values()[tIntRarity];
-
-				}
-				if( tFlagsOK )
-				{
-					LootGroup tGrp = EnhancedLootBags.LootGroupHandler.getGroupByID( tGroupID );
-
-					if( tGrp == null )
-					{
-						LootGroup tNewGroup = tLGF.createLootGroup( tGroupID, tGroupName, tRarity, tMinItems, tMaxItems, true );
-						EnhancedLootBags.LootGroupHandler.getLootGroups().getLootTable().add( tNewGroup );
-						EnhancedLootBags.LootGroupHandler.SaveLootGroups();
-						PlayerChatHelper.SendInfo( pCmdSender, String.format( "New group added (ID: %d Name: %s)", tGroupID, tGroupName ) );
-					}
-					else
-						PlayerChatHelper.SendError( pCmdSender, String.format( "LootGroup ID %d is already in use", tGroupID ) );
-				}
-				else
-					PlayerChatHelper.SendError( pCmdSender, String.format( "Some flags are wrong. Make sure to read the readme" ) );
-			}
-
-		}
-		catch( Exception e )
-		{
-			e.printStackTrace();
-			PlayerChatHelper.SendError( pCmdSender, "Unknown error occoured" );
-		}
-		*/
+		 * try
+		 * {
+		 * if( pArgs.length < 1 )
+		 * {
+		 * SendHelpToPlayer( pCmdSender );
+		 * return;
+		 * }
+		 * String tSubCommand = pArgs[0];
+		 * if( tSubCommand.equalsIgnoreCase( "reload" ) )
+		 * {
+		 * if( EnhancedLootBags.LootGroupHandler.reload() )
+		 * PlayerChatHelper.SendInfo( pCmdSender, String.format( "Reload successful" ) );
+		 * else
+		 * PlayerChatHelper.SendError( pCmdSender, String.format( "Reload successful" ) );
+		 * return;
+		 * }
+		 * LootGroupsFactory tLGF = new LootGroupsFactory();
+		 * if( !InGame( pCmdSender ) )
+		 * {
+		 * PlayerChatHelper.SendPlain( pCmdSender, "You have to execute this command ingame" );
+		 * return;
+		 * }
+		 * EntityPlayer tEp = (EntityPlayer) pCmdSender;
+		 * ItemStack inHand = null;
+		 * if( tEp != null )
+		 * {
+		 * inHand = tEp.getCurrentEquippedItem();
+		 * if( inHand == null )
+		 * {
+		 * PlayerChatHelper.SendPlain( pCmdSender, "Pickup an item first" );
+		 * return;
+		 * }
+		 * }
+		 * if( tSubCommand.equalsIgnoreCase( "addloot" ) || tSubCommand.equalsIgnoreCase( "addinventory" ) )
+		 * {
+		 * int tGroupID = Integer.parseInt( pArgs[1] );
+		 * int tAmount = 1;
+		 * int tChance = 100;
+		 * int tLimitedDropCount = 0;
+		 * int tRandomAmount = 0;
+		 * boolean tFlagsOK = true;
+		 * if( tGroupID < 0 || tGroupID > 32767 )
+		 * tFlagsOK = false;
+		 * if( pArgs.length == 6 )
+		 * {
+		 * tAmount = Integer.parseInt( pArgs[2] );
+		 * tChance = Integer.parseInt( pArgs[3] );
+		 * tLimitedDropCount = Integer.parseInt( pArgs[4] );
+		 * tRandomAmount = Integer.parseInt( pArgs[5] );
+		 * if( tAmount < 1 || tAmount > 64 )
+		 * tFlagsOK = false;
+		 * if( tChance < 1 || tChance > 255 )
+		 * tFlagsOK = false;
+		 * if( tLimitedDropCount < 0 || tChance > 255 )
+		 * tFlagsOK = false;
+		 * if( tRandomAmount < 0 || tRandomAmount > 1 )
+		 * tFlagsOK = false;
+		 * }
+		 * if( tFlagsOK )
+		 * {
+		 * LootGroup tGrp = EnhancedLootBags.LootGroupHandler.getGroupByID( tGroupID );
+		 * if( tGrp != null )
+		 * {
+		 * List<ItemStack> tStacksToAdd = new ArrayList<ItemStack>();
+		 * if( tSubCommand.equalsIgnoreCase( "addloot" ) )
+		 * tStacksToAdd.add( inHand.copy() );
+		 * else if( tSubCommand.equalsIgnoreCase( "addinventory" ) )
+		 * {
+		 * for( ItemStack is : tEp.inventory.mainInventory )
+		 * if( is != null )
+		 * tStacksToAdd.add( is.copy() );
+		 * }
+		 * for( ItemStack tis : tStacksToAdd )
+		 * {
+		 * String tItemID = ItemDescriptor.fromStack( tis ).toString();
+		 * if( tItemID.isEmpty() )
+		 * continue; // Something went wrong..
+		 * String tItemNBT = "";
+		 * if( tis.stackTagCompound != null )
+		 * tItemNBT = tis.stackTagCompound.toString();
+		 * Drop dr = tLGF.createDrop( tItemID, UUID.randomUUID().toString(), tItemNBT, tAmount, tRandomAmount == 1 ?
+		 * true : false, tChance, tLimitedDropCount, "" );
+		 * tGrp.getDrops().add( dr );
+		 * EnhancedLootBags.LootGroupHandler.SaveLootGroups();
+		 * PlayerChatHelper.SendInfo( pCmdSender, String.format( "Item %s added to LootGroup ID %d ", tItemID,
+		 * tGrp.getGroupID() ) );
+		 * }
+		 * }
+		 * else
+		 * PlayerChatHelper.SendError( pCmdSender, String.format( "LootGroup ID %d is unknown", tGroupID ) );
+		 * }
+		 * else
+		 * PlayerChatHelper.SendError( pCmdSender, String.format( "Some flags are wrong. Make sure to read the readme" )
+		 * );
+		 * }
+		 * else if( tSubCommand.equalsIgnoreCase( "addgroup" ) )
+		 * {
+		 * int tGroupID = Integer.parseInt( pArgs[1] );
+		 * String tGroupName = String.format( "Unnamed group %d", tGroupID );
+		 * EnumRarity tRarity = EnumRarity.common;
+		 * int tMinItems = 1;
+		 * int tMaxItems = 1;
+		 * boolean tFlagsOK = true;
+		 * if( tGroupID < 0 || tGroupID > 32767 )
+		 * tFlagsOK = false; // Just to be sure...
+		 * if( pArgs.length == 5 )
+		 * {
+		 * int tIntRarity = Integer.parseInt( pArgs[2] );
+		 * tMinItems = Integer.parseInt( pArgs[3] );
+		 * tMaxItems = Integer.parseInt( pArgs[4] );
+		 * if( tMinItems > tMaxItems )
+		 * tFlagsOK = false;
+		 * if( tMinItems < 1 || tMaxItems < 1 )
+		 * tFlagsOK = false;
+		 * if( tIntRarity < 0 || tIntRarity >= EnumRarity.values().length )
+		 * tFlagsOK = false;
+		 * else
+		 * tRarity = EnumRarity.values()[tIntRarity];
+		 * }
+		 * if( tFlagsOK )
+		 * {
+		 * LootGroup tGrp = EnhancedLootBags.LootGroupHandler.getGroupByID( tGroupID );
+		 * if( tGrp == null )
+		 * {
+		 * LootGroup tNewGroup = tLGF.createLootGroup( tGroupID, tGroupName, tRarity, tMinItems, tMaxItems, true );
+		 * EnhancedLootBags.LootGroupHandler.getLootGroups().getLootTable().add( tNewGroup );
+		 * EnhancedLootBags.LootGroupHandler.SaveLootGroups();
+		 * PlayerChatHelper.SendInfo( pCmdSender, String.format( "New group added (ID: %d Name: %s)", tGroupID,
+		 * tGroupName ) );
+		 * }
+		 * else
+		 * PlayerChatHelper.SendError( pCmdSender, String.format( "LootGroup ID %d is already in use", tGroupID ) );
+		 * }
+		 * else
+		 * PlayerChatHelper.SendError( pCmdSender, String.format( "Some flags are wrong. Make sure to read the readme" )
+		 * );
+		 * }
+		 * }
+		 * catch( Exception e )
+		 * {
+		 * e.printStackTrace();
+		 * PlayerChatHelper.SendError( pCmdSender, "Unknown error occoured" );
+		 * }
+		 */
 	}
 
 	private boolean InGame( ICommandSender pCmdSender )

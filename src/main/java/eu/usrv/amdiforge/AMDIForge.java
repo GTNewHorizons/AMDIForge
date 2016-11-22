@@ -12,6 +12,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import eu.usrv.amdiforge.config.AMDIConfig;
+import eu.usrv.amdiforge.core.GraveFileHandler;
 import eu.usrv.amdiforge.proxy.CommonProxy;
 import eu.usrv.amdiforge.server.AMDICommand;
 import eu.usrv.yamcore.auxiliary.IngameErrorLog;
@@ -26,6 +27,7 @@ public class AMDIForge
 	public static final String MODNAME = "A.M.D.I. Forge";
 	public static final String NICEFOLDERNAME = "AMDI";
 	public static AMDIConfig AMDICfg = null;
+	public static GraveFileHandler GraveHdl = new GraveFileHandler( );
 	public static IngameErrorLog AdminLogonErrors = null;
 	public static LogHelper Logger = new LogHelper( MODID );
 	public static Random Rnd = null;

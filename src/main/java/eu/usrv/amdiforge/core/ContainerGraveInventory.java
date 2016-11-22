@@ -24,8 +24,8 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-
-import eu.usrv.enhancedlootbags.EnhancedLootBags;
+import eu.usrv.amdiforge.AMDIForge;
+import eu.usrv.yamcore.auxiliary.LogHelper;
 
 
 public class ContainerGraveInventory extends Container
@@ -34,16 +34,17 @@ public class ContainerGraveInventory extends Container
 	 * This is a fake container class that is used to provide ghost-item slots for the lootbags.
 	 * Inventory won't accept any item, nor can you take items from it
 	 */
-	public static class FakeLootBagInventory implements IInventory
+	public static class FakeGUIInventory implements IInventory
 	{
 		private final ItemStack[] mInventory;
-		//private final LootGroupsHandler mLGH = EnhancedLootBags.LootGroupHandler;
+		private final GraveFileHandler _mGFH = AMDIForge.GraveHdl;
 		private final int mSlotCount = 108;
+		private LogHelper _mLogger = AMDIForge.Logger;
 
-		public FakeLootBagInventory( int pLootGroupID )
+		public FakeGUIInventory( String pGraveFile )
 		{
-			// MainRegistry.Logger.info(String.format("Creating fakeInventory for lootgroup %d", pLootGroupID));
-			mInventory = mLGH.createFakeInventoryFromID( pLootGroupID, mSlotCount );
+			_mLogger.info( String.format( "Creating fakeInventory for GraveFile %s", pGraveFile ) );
+			mInventory = _mGFH.createFakeInventoryFromGrave( pGraveFile );
 		}
 
 		@Override
@@ -124,7 +125,7 @@ public class ContainerGraveInventory extends Container
 		}
 	}
 
-	private final FakeLootBagInventory mInventory;
+	private final FakeGUIInventory mInventory;
 	private static final int GUI_ROWS = 9;
 	private static final int GUI_COLUMNS = 12;
 	private static final int GUI_STARTX = 12;
@@ -139,9 +140,9 @@ public class ContainerGraveInventory extends Container
 	 * @param inventoryPlayer
 	 * @param pLootGroupMeta
 	 */
-	public ContainerGraveInventory( InventoryPlayer inventoryPlayer, int pLootGroupMeta )
+	public ContainerGraveInventory( InventoryPlayer inventoryPlayer, String pGraveFile )
 	{
-		mInventory = new FakeLootBagInventory( pLootGroupMeta );
+		mInventory = new FakeGUIInventory( pGraveFile );
 		for( int row = 0; row < GUI_ROWS; row++ )
 		{
 			for( int col = 0; col < GUI_COLUMNS; col++ )
