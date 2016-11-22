@@ -19,10 +19,16 @@ package eu.usrv.amdiforge.core;
 
 
 import java.io.File;
+import java.io.FilenameFilter;
+import java.util.List;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.World;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Lists;
+
 import eu.usrv.amdiforge.AMDIForge;
 import eu.usrv.amdiforge.core.graveIO.GraveNBT;
 import eu.usrv.yamcore.auxiliary.LogHelper;
@@ -35,7 +41,7 @@ public class GraveFileHandler
 
 	private boolean _mInitialized = false;
 
-	public GraveFileHandler( )
+	public GraveFileHandler()
 	{
 	}
 
@@ -54,9 +60,9 @@ public class GraveFileHandler
 		{
 			GraveNBT tGrave = GraveNBT.getGrave( pGraveFile );
 			ItemStack[] tmpList = tGrave.getGraveInventory();
-			for (int i = 0; i < tmpList.length; i++)
+			for( int i = 0; i < tmpList.length; i++ )
 			{
-				if (tmpList[i] != null)
+				if( tmpList[i] != null )
 					tList[i] = tmpList[i].copy();
 			}
 		}
@@ -66,5 +72,37 @@ public class GraveFileHandler
 		}
 		// _mLogger.info(String.format("fakeInventory contains %d items", i));
 		return tList;
+	}
+
+	public static File getSaveFolder( World world )
+	{
+		File dummy = world.getSaveHandler().getMapFileFromName( "dummy" );
+		return dummy.getParentFile();
+	}
+
+	private static final String PREFIX = "inventory-";
+
+	public List<String> getMatchedDumps( World world, String prefix )
+	{
+		File saveFolder = getSaveFolder( world );
+		final String actualPrefix = StringUtils.startsWithIgnoreCase( prefix, PREFIX ) ? prefix : PREFIX + prefix;
+		File[] files = saveFolder.listFiles( new FilenameFilter(){
+			@Override
+			public boolean accept( File dir, String name )
+			{
+				return name.startsWith( actualPrefix );
+			}
+		} );
+
+		List<String> result = Lists.newArrayList();
+		int toCut = PREFIX.length();
+
+		for( File f : files )
+		{
+			String name = f.getName();
+			result.add( name.substring( toCut, name.length() - 4 ) );
+		}
+
+		return result;
 	}
 }
