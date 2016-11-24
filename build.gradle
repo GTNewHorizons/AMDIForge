@@ -17,6 +17,12 @@ buildscript {
 
 apply plugin: 'forge'
 
+allprojects {
+    apply plugin: 'java'
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
+
 file "build.properties" withReader {
     def prop = new Properties()
     prop.load(it)
@@ -28,7 +34,7 @@ group= "eu.usrv" // http://maven.apache.org/guides/mini/guide-naming-conventions
 archivesBaseName = "AMDIForge"
 
 minecraft {
-    version = "${config.minecraft.version}-${config.forge.version}"
+    version = "${config.forge.version}-${config.minecraft.version}"
     runDir = "eclipse"
 }
 
