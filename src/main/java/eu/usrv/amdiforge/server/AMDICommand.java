@@ -28,17 +28,18 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.EnumChatFormatting;
 
 import org.apache.commons.lang3.StringUtils;
 
 import cpw.mods.fml.common.registry.GameRegistry;
-
 import eu.usrv.amdiforge.AMDIForge;
 import eu.usrv.amdiforge.client.gui.GuiAMDI;
 import eu.usrv.amdiforge.core.graveIO.GraveNBT;
 import eu.usrv.yamcore.auxiliary.PlayerChatHelper;
 import eu.usrv.yamcore.auxiliary.TabText;
 import eu.usrv.yamcore.auxiliary.classes.JSONChatText;
+import eu.usrv.yamcore.auxiliary.classes.JSONClickEvent;
 import eu.usrv.yamcore.auxiliary.classes.JSONHoverEvent;
 
 
@@ -117,6 +118,7 @@ public class AMDICommand implements ICommand
 			}
 			else if( tSubCommand.equalsIgnoreCase( "gtp" ) )
 			{
+				teleportToGrave( tEP, tFullGravePath.getAbsolutePath() );
 			}
 			else if( tSubCommand.equalsIgnoreCase( "gp" ) )
 			{
@@ -131,6 +133,12 @@ public class AMDICommand implements ICommand
 		// "/home/namikon/Git/AMDIForge/testgrave.dat" ) );
 	}
 
+	private void teleportToGrave( EntityPlayer pEP, String pFullGravePath )
+	{
+		GraveNBT tGrave = GraveNBT.getGrave( pFullGravePath );
+		pEP.setPositionAndUpdate(tGrave.getGraveLocation().xCoord, tGrave.getGraveLocation().yCoord, tGrave.getGraveLocation().zCoord);
+	}
+	
 	private void displayGraveInfo( EntityPlayer pCmdSender, String pGraveFile, String pFullGravePath )
 	{
 		GraveNBT tGrave = GraveNBT.getGrave( pFullGravePath );
@@ -144,7 +152,7 @@ public class AMDICommand implements ICommand
 		
 		tMultilineString = String.format( tMultilineString, pGraveFile, 
 				tGrave.getCreated().toString(),
-				( tGrave.getPlacedFlag() == 1 ? "§2Yes" : "§4No" ),
+				( tGrave.getPlacedFlag() == 1 ? EnumChatFormatting.DARK_GREEN + "Yes" + EnumChatFormatting.RESET : EnumChatFormatting.DARK_RED + "No" + EnumChatFormatting.RESET ),
 				(int) tGrave.getGraveLocation().xCoord,
 				(int) tGrave.getGraveLocation().yCoord,
 				(int) tGrave.getGraveLocation().zCoord,
@@ -159,7 +167,22 @@ public class AMDICommand implements ICommand
 			PlayerChatHelper.SendPlain( pCmdSender, tLine );
 		}
 
-		PlayerChatHelper.SendPlain( pCmdSender, "§4[§3Open Grave§4] [§3Teleport§4]§r" );
+		JSONChatText tGraveOpen = JSONChatText.simpleMessage("[Open]");
+		tGraveOpen.Color = EnumChatFormatting.AQUA;
+		tGraveOpen.HoverEvent = JSONHoverEvent.SimpleText("Opens this Grave in the Grave-Inspector");
+		tGraveOpen.ClickEvent = JSONClickEvent.runCommand(String.format("/amdi gi %s", pGraveFile));
+		
+		JSONChatText tGraveTeleport = JSONChatText.simpleMessage("[Teleport]");
+		tGraveTeleport.Color = EnumChatFormatting.AQUA;
+		tGraveTeleport.HoverEvent = JSONHoverEvent.SimpleText("Teleports you directly to the recorded spawn-location of this grave");
+		tGraveTeleport.ClickEvent = JSONClickEvent.runCommand(String.format("/amdi gtp %s", pGraveFile));
+		
+		
+		try {
+			PlayerChatHelper.SendJsonFormatted(pCmdSender, "Possible actions: {0} {1} ", tGraveOpen, tGraveTeleport);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		//PlayerChatHelper.SendJsonRaw( pCmdSender, JSONChatText.simpleMessage( tt.getPage( 0, false ) ) );
 
