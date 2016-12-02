@@ -55,7 +55,11 @@ public class GraveFileHandler
 	public ItemStack[] createFakeInventoryFromGrave( String pGraveFile )
 	{
 		// dumpDebugInfo("createFakeInventoryFromID");
-		ItemStack[] tList = new ItemStack[108];
+	  ItemStack[] tList = new ItemStack[108];
+	  
+	  if (pGraveFile == "")
+	    return tList;
+		
 		try
 		{
 			GraveNBT tGrave = GraveNBT.getGrave( pGraveFile );

@@ -18,6 +18,8 @@
 package eu.usrv.amdiforge;
 
 
+import java.util.HashMap;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
@@ -27,27 +29,34 @@ import eu.usrv.amdiforge.core.ContainerGraveInventory;
 
 public class GuiHandler implements IGuiHandler
 {
-	public static int GUI_GRAVEVIEW = 1;
+  public static HashMap<String, String> PendingGraveUIs = new HashMap<String, String>();
 
-	@Override
-	public Object getServerGuiElement( int pGuiID, EntityPlayer pPlayer, World pWorld, int pX, int pY, int pZ )
-	{
-		if( pGuiID == GUI_GRAVEVIEW )
-		{
-			return new ContainerGraveInventory( pPlayer.inventory, "/home/namikon/Git/AMDIForge/testgrave.dat" );
-		}
+  public static int GUI_GRAVEVIEW = 1;
 
-		return null;
-	}
+  @Override
+  public Object getServerGuiElement( int pGuiID, EntityPlayer pPlayer, World pWorld, int pX, int pY, int pZ )
+  {
+    if( pGuiID == GUI_GRAVEVIEW )
+    {
+      if( PendingGraveUIs.containsKey( pPlayer.getUniqueID().toString() ) )
+      {
+        String tGravePath = PendingGraveUIs.get( pPlayer.getUniqueID().toString() ).toString();
+        PendingGraveUIs.remove( pPlayer.getUniqueID().toString() );
+        return new ContainerGraveInventory( pPlayer.inventory, tGravePath );
+      }
+    }
 
-	@Override
-	public Object getClientGuiElement( int pGuiID, EntityPlayer pPlayer, World pWorld, int pX, int pY, int pZ )
-	{
-		if( pGuiID == GUI_GRAVEVIEW )
-		{
-			return new GuiAMDI( pPlayer.inventory, "" ); // Not required; Inventory Content is serverside
-		}
+    return null;
+  }
 
-		return null;
-	}
+  @Override
+  public Object getClientGuiElement( int pGuiID, EntityPlayer pPlayer, World pWorld, int pX, int pY, int pZ )
+  {
+    if( pGuiID == GUI_GRAVEVIEW )
+    {
+      return new GuiAMDI( pPlayer.inventory, "" ); // Not required; Inventory Content is serverside
+    }
+
+    return null;
+  }
 }
