@@ -54,7 +54,6 @@ public class GraveFileHandler
 	 */
 	public ItemStack[] createFakeInventoryFromGrave( String pGraveFile )
 	{
-		// dumpDebugInfo("createFakeInventoryFromID");
 	  ItemStack[] tList = new ItemStack[108];
 	  
 	  if (pGraveFile == "")
@@ -74,7 +73,7 @@ public class GraveFileHandler
 		{
 			e.printStackTrace();
 		}
-		// _mLogger.info(String.format("fakeInventory contains %d items", i));
+		//_mLogger.info(String.format("fakeInventory contains %d items", i));
 		return tList;
 	}
 

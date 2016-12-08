@@ -13,6 +13,7 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import eu.usrv.amdiforge.config.AMDIConfig;
 import eu.usrv.amdiforge.core.GraveFileHandler;
+import eu.usrv.amdiforge.net.AMDIDispatcher;
 import eu.usrv.amdiforge.proxy.CommonProxy;
 import eu.usrv.amdiforge.server.AMDICommand;
 import eu.usrv.yamcore.auxiliary.IngameErrorLog;
@@ -31,6 +32,7 @@ public class AMDIForge
 	public static IngameErrorLog AdminLogonErrors = null;
 	public static LogHelper Logger = new LogHelper( MODID );
 	public static Random Rnd = null;
+	public static AMDIDispatcher NW;
 
 	@SidedProxy( clientSide = "eu.usrv.amdiforge.proxy.ClientProxy", serverSide = "eu.usrv.amdiforge.proxy.CommonProxy" )
 	public static CommonProxy proxy;
@@ -47,6 +49,9 @@ public class AMDIForge
 			Logger.error(String.format("%s could not load its config file. Things are going to be weird!", MODID));
         
 		AdminLogonErrors = new IngameErrorLog();
+		
+//		NW = new AMDIDispatcher();
+//		NW.registerPackets();
 	}
 
 	@EventHandler

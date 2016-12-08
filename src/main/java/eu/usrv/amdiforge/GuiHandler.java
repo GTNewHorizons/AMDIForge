@@ -56,7 +56,6 @@ public class GuiHandler implements IGuiHandler
     {
       return new GuiAMDI( pPlayer.inventory, "" ); // Not required; Inventory Content is serverside
     }
-
     return null;
   }
 }

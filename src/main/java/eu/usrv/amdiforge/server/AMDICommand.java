@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -37,8 +36,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import eu.usrv.amdiforge.AMDIForge;
 import eu.usrv.amdiforge.GuiHandler;
-import eu.usrv.amdiforge.client.gui.GuiAMDI;
 import eu.usrv.amdiforge.core.graveIO.GraveNBT;
+import eu.usrv.amdiforge.net.msg.OpenGraveGuiMessage;
 import eu.usrv.yamcore.auxiliary.ItemDescriptor;
 import eu.usrv.yamcore.auxiliary.PlayerChatHelper;
 import eu.usrv.yamcore.auxiliary.TabText;
@@ -59,6 +58,7 @@ public class AMDICommand implements ICommand
 
   public AMDICommand()
   {
+    net.minecraft.block.BlockChest bc = null;
     this.aliases = new ArrayList();
     this.aliases.add( "amdi" );
     populateHelp();
@@ -127,6 +127,7 @@ public class AMDICommand implements ICommand
           // );
           GuiHandler.PendingGraveUIs.put( tEP.getUniqueID().toString(), tFullGravePath.getAbsolutePath() );
           tEP.openGui( AMDIForge.instance, GuiHandler.GUI_GRAVEVIEW, tEP.worldObj, (int) tEP.posX, (int) tEP.posY, (int) tEP.posZ );
+          //AMDIForge.NW.sendTo( new OpenGraveGuiMessage( tFullGravePath.getAbsolutePath() ), (EntityPlayerMP) tEP );          
         }
         else if( tSubCommand.equalsIgnoreCase( "gtp" ) )
         {

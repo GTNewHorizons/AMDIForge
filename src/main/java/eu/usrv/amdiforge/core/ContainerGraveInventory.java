@@ -148,7 +148,7 @@ public class ContainerGraveInventory extends Container
     for( int row = 0; row < GUI_ROWS; row++ )
     {
       for( int col = 0; col < GUI_COLUMNS; col++ )
-        addSlotToContainer( new SlotLootBag( mInventory, col + row * GUI_COLUMNS, GUI_STARTX + GUI_SLOTWIDTH * col, GUI_STARTY + GUI_SLOTHEIGHT * row ) );
+        addSlotToContainer( new GhostSlot( mInventory, col + row * GUI_COLUMNS, GUI_STARTX + GUI_SLOTWIDTH * col, GUI_STARTY + GUI_SLOTHEIGHT * row ) );
     }
     bindPlayerInventory( inventoryPlayer, 238, 256 );
   }
