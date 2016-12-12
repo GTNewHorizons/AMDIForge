@@ -37,7 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import eu.usrv.amdiforge.AMDIForge;
 import eu.usrv.amdiforge.GuiHandler;
 import eu.usrv.amdiforge.core.graveIO.GraveNBT;
-import eu.usrv.amdiforge.net.msg.OpenGraveGuiMessage;
+import eu.usrv.amdiforge.net.msg.GraveContentDisplayMessage;
 import eu.usrv.yamcore.auxiliary.ItemDescriptor;
 import eu.usrv.yamcore.auxiliary.PlayerChatHelper;
 import eu.usrv.yamcore.auxiliary.TabText;
@@ -123,11 +123,10 @@ public class AMDICommand implements ICommand
         }
         else if( tSubCommand.equalsIgnoreCase( "gi" ) )
         {
-          // Minecraft.getMinecraft().displayGuiScreen( new GuiAMDI( tEP.inventory, tFullGravePath.getAbsolutePath() )
-          // );
           GuiHandler.PendingGraveUIs.put( tEP.getUniqueID().toString(), tFullGravePath.getAbsolutePath() );
+
+          AMDIForge.NW.sendTo( new GraveContentDisplayMessage( GraveNBT.loadGraveFile( tFullGravePath.getAbsoluteFile() ) ), (EntityPlayerMP) tEP );
           tEP.openGui( AMDIForge.instance, GuiHandler.GUI_GRAVEVIEW, tEP.worldObj, (int) tEP.posX, (int) tEP.posY, (int) tEP.posZ );
-          //AMDIForge.NW.sendTo( new OpenGraveGuiMessage( tFullGravePath.getAbsolutePath() ), (EntityPlayerMP) tEP );          
         }
         else if( tSubCommand.equalsIgnoreCase( "gtp" ) )
         {

@@ -21,6 +21,7 @@ package eu.usrv.amdiforge.client.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
@@ -40,9 +41,9 @@ public class GuiAMDI extends GuiContainer
 	public static int GUI_SizeX = 237;
 	public static int GUI_SizeY = 255;
 
-	public GuiAMDI( InventoryPlayer pInventoryPlayer, String pGraveFile )
+	public GuiAMDI( InventoryPlayer pInventoryPlayer, NBTTagCompound pGraveTag )
 	{
-		super( new ContainerGraveInventory( pInventoryPlayer, pGraveFile ) );
+		super( new ContainerGraveInventory( pInventoryPlayer, pGraveTag ) );
 		xSize = GUI_SizeX;
 		ySize = GUI_SizeY;
 

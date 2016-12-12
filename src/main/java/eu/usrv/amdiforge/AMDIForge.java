@@ -20,7 +20,7 @@ import eu.usrv.yamcore.auxiliary.IngameErrorLog;
 import eu.usrv.yamcore.auxiliary.LogHelper;
 
 
-@Mod( modid = AMDIForge.MODID, name = AMDIForge.MODNAME, version = AMDIForge.VERSION, dependencies = "required-after:Forge@[10.13.2.1291,);required-after:YAMCore@[0.5.66,);" )
+@Mod( modid = AMDIForge.MODID, name = AMDIForge.MODNAME, version = AMDIForge.VERSION, dependencies = "required-after:Forge@[10.13.4.1558,);required-after:YAMCore@[0.5.69,);", acceptableRemoteVersions="*" )
 public class AMDIForge 
 {
 	public static final String MODID = "amdiforge";
@@ -50,8 +50,8 @@ public class AMDIForge
         
 		AdminLogonErrors = new IngameErrorLog();
 		
-//		NW = new AMDIDispatcher();
-//		NW.registerPackets();
+		NW = new AMDIDispatcher();
+		NW.registerPackets();
 	}
 
 	@EventHandler

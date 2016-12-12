@@ -24,6 +24,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import eu.usrv.amdiforge.AMDIForge;
 import eu.usrv.yamcore.auxiliary.LogHelper;
 
@@ -45,6 +46,12 @@ public class ContainerGraveInventory extends Container
     {
       _mLogger.info( String.format( "Creating fakeInventory for GraveFile %s", pGraveFile ) );
       mInventory = _mGFH.createFakeInventoryFromGrave( pGraveFile );
+    }
+
+    public FakeGUIInventory( NBTTagCompound pGraveTag )
+    {
+      _mLogger.info( "Creating fakeInventory from Server Payload" );
+      mInventory = _mGFH.createFakeInventoryFromTagCompound( pGraveTag );
     }
 
     @Override
@@ -134,6 +141,24 @@ public class ContainerGraveInventory extends Container
   private static final int GUI_STARTY = 8;
   private static final int GUI_SLOTHEIGHT = 18;
   private static final int GUI_SLOTWIDTH = 18;
+
+  /**
+   * Populate the GUI with inventory slots. This is now sort of dynamic; as we use static final's to
+   * define max/min for rows, and the start locations
+   * 
+   * @param inventoryPlayer
+   * @param pLootGroupMeta
+   */
+  public ContainerGraveInventory( InventoryPlayer inventoryPlayer, NBTTagCompound pGraveTag )
+  {
+    mInventory = new FakeGUIInventory( pGraveTag );
+    for( int row = 0; row < GUI_ROWS; row++ )
+    {
+      for( int col = 0; col < GUI_COLUMNS; col++ )
+        addSlotToContainer( new GhostSlot( mInventory, col + row * GUI_COLUMNS, GUI_STARTX + GUI_SLOTWIDTH * col, GUI_STARTY + GUI_SLOTHEIGHT * row ) );
+    }
+    bindPlayerInventory( inventoryPlayer, 238, 256 );
+  }
 
   /**
    * Populate the GUI with inventory slots. This is now sort of dynamic; as we use static final's to

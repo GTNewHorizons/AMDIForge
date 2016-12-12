@@ -23,6 +23,7 @@ import java.io.FilenameFilter;
 import java.util.List;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +46,38 @@ public class GraveFileHandler
 	{
 	}
 
+	 /**
+   * Creates a fake Array of ItemStacks for given LootGroupID
+   * This should only execute on the SERVER thread
+   * 
+   * @param pLootGroupID
+   * @return
+   */
+  public ItemStack[] createFakeInventoryFromTagCompound( NBTTagCompound pGraveTag )
+  {
+    ItemStack[] tList = new ItemStack[108];
+    
+    if (pGraveTag == null)
+      return tList;
+    
+    try
+    {
+      GraveNBT tGrave = GraveNBT.getGrave( pGraveTag );
+      ItemStack[] tmpList = tGrave.getGraveInventory();
+      for( int i = 0; i < tmpList.length; i++ )
+      {
+        if( tmpList[i] != null )
+          tList[i] = tmpList[i].copy();
+      }
+    }
+    catch( Exception e )
+    {
+      e.printStackTrace();
+    }
+    //_mLogger.info(String.format("fakeInventory contains %d items", i));
+    return tList;
+  }
+	
 	/**
 	 * Creates a fake Array of ItemStacks for given LootGroupID
 	 * This should only execute on the SERVER thread

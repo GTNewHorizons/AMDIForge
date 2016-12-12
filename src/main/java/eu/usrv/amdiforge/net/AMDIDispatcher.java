@@ -19,7 +19,7 @@ package eu.usrv.amdiforge.net;
 
 
 import eu.usrv.amdiforge.AMDIForge;
-import eu.usrv.amdiforge.net.msg.OpenGraveGuiMessage;
+import eu.usrv.amdiforge.net.msg.GraveContentDisplayMessage;
 import eu.usrv.yamcore.network.PacketDispatcher;
 
 
@@ -33,6 +33,6 @@ public class AMDIDispatcher extends PacketDispatcher
   @Override
   public void registerPackets()
   {
-    registerMessage( OpenGraveGuiMessage.OpenGraveGuiMessageHandler.class, OpenGraveGuiMessage.class );
+    registerMessage( GraveContentDisplayMessage.GraveContentDisplayMessageHandler.class, GraveContentDisplayMessage.class );
   }
 }

@@ -21,6 +21,7 @@ package eu.usrv.amdiforge;
 import java.util.HashMap;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.network.IGuiHandler;
 import eu.usrv.amdiforge.client.gui.GuiAMDI;
@@ -30,7 +31,8 @@ import eu.usrv.amdiforge.core.ContainerGraveInventory;
 public class GuiHandler implements IGuiHandler
 {
   public static HashMap<String, String> PendingGraveUIs = new HashMap<String, String>();
-
+  public static NBTTagCompound PendingGraveNBT = null;
+  
   public static int GUI_GRAVEVIEW = 1;
 
   @Override
@@ -54,7 +56,7 @@ public class GuiHandler implements IGuiHandler
   {
     if( pGuiID == GUI_GRAVEVIEW )
     {
-      return new GuiAMDI( pPlayer.inventory, "" ); // Not required; Inventory Content is serverside
+      return new GuiAMDI( pPlayer.inventory, PendingGraveNBT ); 
     }
     return null;
   }

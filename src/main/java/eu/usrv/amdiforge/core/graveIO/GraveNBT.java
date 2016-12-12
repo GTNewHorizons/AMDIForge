@@ -40,136 +40,150 @@ import eu.usrv.yamcore.auxiliary.LogHelper;
 
 public class GraveNBT
 {
-	public String getPlayerUUID()
-	{
-		return _mGraveNBT.getString( "PlayerUUID" );
-	}
+  public String getPlayerUUID()
+  {
+    return _mGraveNBT.getString( "PlayerUUID" );
+  }
 
-	public String getPlayerName()
-	{
-		return _mGraveNBT.getString( "PlayerName" );
-	}
+  public String getPlayerName()
+  {
+    return _mGraveNBT.getString( "PlayerName" );
+  }
 
-	public Vec3 getGraveLocation()
-	{
-		NBTTagCompound graveLocation = _mGraveNBT.getCompoundTag( "GraveLocation" );
-		return Vec3.createVectorHelper( graveLocation.getInteger( "X" ), graveLocation.getInteger( "Y" ), graveLocation.getInteger( "Z" ) );
-	}
+  public Vec3 getGraveLocation()
+  {
+    NBTTagCompound graveLocation = _mGraveNBT.getCompoundTag( "GraveLocation" );
+    return Vec3.createVectorHelper( graveLocation.getInteger( "X" ), graveLocation.getInteger( "Y" ), graveLocation.getInteger( "Z" ) );
+  }
 
-	public Vec3 getPlayerLocation()
-	{
-		NBTTagCompound playerLocation = _mGraveNBT.getCompoundTag( "PlayerLocation" );
-		return Vec3.createVectorHelper( playerLocation.getInteger( "X" ), playerLocation.getInteger( "Y" ), playerLocation.getInteger( "Z" ) );
-	}
+  public Vec3 getPlayerLocation()
+  {
+    NBTTagCompound playerLocation = _mGraveNBT.getCompoundTag( "PlayerLocation" );
+    return Vec3.createVectorHelper( playerLocation.getInteger( "X" ), playerLocation.getInteger( "Y" ), playerLocation.getInteger( "Z" ) );
+  }
 
-	public Date getCreated()
-	{
-		return new Date( _mGraveNBT.getLong( "Created" ) );
-	}
+  public Date getCreated()
+  {
+    return new Date( _mGraveNBT.getLong( "Created" ) );
+  }
 
-	public int getPlacedFlag()
-	{
-		return _mGraveNBT.getInteger( "Placed" );
-	}
+  public int getPlacedFlag()
+  {
+    return _mGraveNBT.getInteger( "Placed" );
+  }
 
-	private File _mGraveFile = null;
-	NBTTagCompound _mGraveNBT = null;
-	// IInventory _mMainInventory = null;
+  private File _mGraveFile = null;
+  NBTTagCompound _mGraveNBT = null;
+  // IInventory _mMainInventory = null;
 
-	private static LogHelper _mLogger = AMDIForge.Logger;
+  private static LogHelper _mLogger = AMDIForge.Logger;
 
-	public static GraveNBT getGrave( String pFullPath )
-	{
-		File f = new File( pFullPath );
-		if( !f.exists() )
-			throw new IllegalArgumentException( pFullPath );
-		else
-			return new GraveNBT( pFullPath );
-	}
+  public static GraveNBT getGrave( String pFullPath )
+  {
+    File f = new File( pFullPath );
+    if( !f.exists() )
+      throw new IllegalArgumentException( pFullPath );
+    else
+      return new GraveNBT( pFullPath );
+  }
 
-	private GraveNBT( String pFullPath )
-	{
-		_mGraveFile = new File( pFullPath );
-		_mGraveNBT = loadGraveFile( _mGraveFile );
-		if( _mGraveNBT == null )
-			throw new IllegalArgumentException( pFullPath );
-		else
-			loadInventory( _mGraveNBT );
-	}
+  public static GraveNBT getGrave( NBTTagCompound pGraveTag )
+  {
+    if( pGraveTag == null )
+      throw new IllegalArgumentException( "GraveTag is null" );
+    else
+      return new GraveNBT( pGraveTag );
+  }
 
-	private void loadInventory( NBTTagCompound rootTag )
-	{
-		if( !rootTag.hasKey( "Inventory", Constants.NBT.TAG_COMPOUND ) )
-		{
-			_mLogger.error( "GraveFile does not contain a Inventory-Tag!" );
-		}
+  private GraveNBT( NBTTagCompound pGraveTag )
+  {
+    _mGraveNBT = pGraveTag;
+    loadInventory( _mGraveNBT );
+  }
 
-		NBTTagCompound tInvTag = rootTag.getCompoundTag( "Inventory" );
-		readFromNBT( tInvTag );
-	}
+  private GraveNBT( String pFullPath )
+  {
+    _mGraveFile = new File( pFullPath );
+    _mGraveNBT = loadGraveFile( _mGraveFile );
+    if( _mGraveNBT == null )
+      throw new IllegalArgumentException( pFullPath );
+    else
+      loadInventory( _mGraveNBT );
+  }
 
-	public ItemStack[] getGraveInventory()
-	{
-		return _mInventoryContents;
-	}
+  private void loadInventory( NBTTagCompound rootTag )
+  {
+    if( !rootTag.hasKey( "Inventory", Constants.NBT.TAG_COMPOUND ) )
+    {
+      _mLogger.error( "GraveFile does not contain a Inventory-Tag!" );
+    }
 
-	private ItemStack[] _mInventoryContents;
-	private int _mSlotsCount;
+    NBTTagCompound tInvTag = rootTag.getCompoundTag( "Inventory" );
+    readFromNBT( tInvTag );
+  }
 
-	private void readFromNBT( NBTTagCompound tag )
-	{
-		if( tag.hasKey( "size" ) )
-		{
-			_mSlotsCount = tag.getInteger( "size" );
-		}
+  public ItemStack[] getGraveInventory()
+  {
+    return _mInventoryContents;
+  }
 
-		NBTTagList nbttaglist = tag.getTagList( "Items", 10 );
-		_mInventoryContents = new ItemStack[_mSlotsCount];
+  private ItemStack[] _mInventoryContents;
+  private int _mSlotsCount;
 
-		for( int i = 0; i < nbttaglist.tagCount(); i++ )
-		{
-			NBTTagCompound stacktag = nbttaglist.getCompoundTagAt( i );
-			NBTTagCompound tSubTag = null;
-			String tItemID = stacktag.getString( "id" );
-			byte tCount = stacktag.getByte( "Count" );
-			short tDamage = stacktag.getShort( "Damage" );
-			if( stacktag.hasKey( "tag" ) )
-			{
-				tSubTag = stacktag.getCompoundTag( "tag" );
-			}
+  private void readFromNBT( NBTTagCompound tag )
+  {
+    if( tag.hasKey( "size" ) )
+    {
+      _mSlotsCount = tag.getInteger( "size" );
+    }
 
-			ItemDescriptor tIDesc = ItemDescriptor.fromString( String.format("%s%s", tItemID, tDamage > 0 ? String.format(":%d", tDamage) : ""), true );
-			if (tIDesc == null)
-				_mLogger.warn(String.format("Item %s could not be loaded. It does not exist anymore, skipping", tItemID));
-			else
-			{
-				if (tSubTag != null)
-					_mInventoryContents[i] = tIDesc.getItemStackwNBT( tCount, tSubTag.toString() );
-				else
-					_mInventoryContents[i] = tIDesc.getItemStack( tCount );
-				_mLogger.info( String.format( "Loaded Item %s from GraveNBT", ( _mInventoryContents[i] == null ? "ERR_ITEM_NULL" : _mInventoryContents[i].getDisplayName() ) ) );
-			}
-		}
-	}
+    NBTTagList nbttaglist = tag.getTagList( "Items", 10 );
+    _mInventoryContents = new ItemStack[_mSlotsCount];
 
-	private static NBTTagCompound loadGraveFile( File pGraveFile )
-	{
-		try
-		{
-			InputStream tStream = new FileInputStream( pGraveFile );
-			try
-			{
-				return CompressedStreamTools.readCompressed( tStream );
-			}
-			finally
-			{
-				tStream.close();
-			}
-		}
-		catch( IOException e )
-		{
-			_mLogger.warn( "Failed to read data from file %s", pGraveFile.getAbsoluteFile() );
-			return null;
-		}
-	}
+    for( int i = 0; i < nbttaglist.tagCount(); i++ )
+    {
+      NBTTagCompound stacktag = nbttaglist.getCompoundTagAt( i );
+      NBTTagCompound tSubTag = null;
+      String tItemID = stacktag.getString( "id" );
+      byte tCount = stacktag.getByte( "Count" );
+      short tDamage = stacktag.getShort( "Damage" );
+      if( stacktag.hasKey( "tag" ) )
+      {
+        tSubTag = stacktag.getCompoundTag( "tag" );
+      }
+
+      ItemDescriptor tIDesc = ItemDescriptor.fromString( String.format( "%s%s", tItemID, tDamage > 0 ? String.format( ":%d", tDamage ) : "" ), true );
+      if( tIDesc == null )
+        _mLogger.warn( String.format( "Item %s could not be loaded. It does not exist anymore, skipping", tItemID ) );
+      else
+      {
+        if( tSubTag != null )
+          _mInventoryContents[i] = tIDesc.getItemStackwNBT( tCount, tSubTag.toString() );
+        else
+          _mInventoryContents[i] = tIDesc.getItemStack( tCount );
+        _mLogger.info( String.format( "Loaded Item %s from GraveNBT", ( _mInventoryContents[i] == null ? "ERR_ITEM_NULL" : _mInventoryContents[i].getDisplayName() ) ) );
+      }
+    }
+  }
+
+  public static NBTTagCompound loadGraveFile( File pGraveFile )
+  {
+    try
+    {
+      InputStream tStream = new FileInputStream( pGraveFile );
+      try
+      {
+        return CompressedStreamTools.readCompressed( tStream );
+      }
+      finally
+      {
+        tStream.close();
+      }
+    }
+    catch( IOException e )
+    {
+      _mLogger.warn( "Failed to read data from file %s", pGraveFile.getAbsoluteFile() );
+      return null;
+    }
+  }
 }
