@@ -37,16 +37,16 @@ import eu.usrv.yamcore.auxiliary.LogHelper;
 
 public class GraveFileHandler
 {
-	private LogHelper _mLogger = AMDIForge.Logger;
-	private String _mConfigFileName;
+  private LogHelper _mLogger = AMDIForge.Logger;
+  private String _mConfigFileName;
 
-	private boolean _mInitialized = false;
+  private boolean _mInitialized = false;
 
-	public GraveFileHandler()
-	{
-	}
+  public GraveFileHandler()
+  {
+  }
 
-	 /**
+  /**
    * Creates a fake Array of ItemStacks for given LootGroupID
    * This should only execute on the SERVER thread
    * 
@@ -56,10 +56,10 @@ public class GraveFileHandler
   public ItemStack[] createFakeInventoryFromTagCompound( NBTTagCompound pGraveTag )
   {
     ItemStack[] tList = new ItemStack[108];
-    
-    if (pGraveTag == null)
+
+    if( pGraveTag == null )
       return tList;
-    
+
     try
     {
       GraveNBT tGrave = GraveNBT.getGrave( pGraveTag );
@@ -74,71 +74,71 @@ public class GraveFileHandler
     {
       e.printStackTrace();
     }
-    //_mLogger.info(String.format("fakeInventory contains %d items", i));
+    // _mLogger.info(String.format("fakeInventory contains %d items", i));
     return tList;
   }
-	
-	/**
-	 * Creates a fake Array of ItemStacks for given LootGroupID
-	 * This should only execute on the SERVER thread
-	 * 
-	 * @param pLootGroupID
-	 * @return
-	 */
-	public ItemStack[] createFakeInventoryFromGrave( String pGraveFile )
-	{
-	  ItemStack[] tList = new ItemStack[108];
-	  
-	  if (pGraveFile == "")
-	    return tList;
-		
-		try
-		{
-			GraveNBT tGrave = GraveNBT.getGrave( pGraveFile );
-			ItemStack[] tmpList = tGrave.getGraveInventory();
-			for( int i = 0; i < tmpList.length; i++ )
-			{
-				if( tmpList[i] != null )
-					tList[i] = tmpList[i].copy();
-			}
-		}
-		catch( Exception e )
-		{
-			e.printStackTrace();
-		}
-		//_mLogger.info(String.format("fakeInventory contains %d items", i));
-		return tList;
-	}
 
-	public static File getSaveFolder( World world )
-	{
-		File dummy = world.getSaveHandler().getMapFileFromName( "dummy" );
-		return dummy.getParentFile();
-	}
+  /**
+   * Creates a fake Array of ItemStacks for given LootGroupID
+   * This should only execute on the SERVER thread
+   * 
+   * @param pLootGroupID
+   * @return
+   */
+  public ItemStack[] createFakeInventoryFromGrave( String pGraveFile )
+  {
+    ItemStack[] tList = new ItemStack[108];
 
-	private static final String PREFIX = "inventory-";
+    if( pGraveFile == "" )
+      return tList;
 
-	public List<String> getMatchedDumps( World world, String prefix )
-	{
-		File saveFolder = getSaveFolder( world );
-		final String actualPrefix = StringUtils.startsWithIgnoreCase( prefix, PREFIX ) ? prefix : PREFIX + prefix;
-		File[] files = saveFolder.listFiles( new FilenameFilter(){
-			@Override
-			public boolean accept( File dir, String name )
-			{
-				return name.startsWith( actualPrefix );
-			}
-		} );
+    try
+    {
+      GraveNBT tGrave = GraveNBT.getGrave( pGraveFile );
+      ItemStack[] tmpList = tGrave.getGraveInventory();
+      for( int i = 0; i < tmpList.length; i++ )
+      {
+        if( tmpList[i] != null )
+          tList[i] = tmpList[i].copy();
+      }
+    }
+    catch( Exception e )
+    {
+      e.printStackTrace();
+    }
+    // _mLogger.info(String.format("fakeInventory contains %d items", i));
+    return tList;
+  }
 
-		List<String> result = Lists.newArrayList();
-		int toCut = PREFIX.length();
+  public static File getSaveFolder( World world )
+  {
+    File dummy = world.getSaveHandler().getMapFileFromName( "dummy" );
+    return dummy.getParentFile();
+  }
 
-		for( File f : files )
-		{
-			String name = f.getName();
-			result.add( name.substring( toCut, name.length() - 4 ) );
-		}
+  private static final String PREFIX = "inventory-";
 
-		return result;
-	}
+  public List<String> getMatchedDumps( World world, String prefix )
+  {
+    File saveFolder = getSaveFolder( world );
+    final String actualPrefix = StringUtils.startsWithIgnoreCase( prefix, PREFIX ) ? prefix : PREFIX + prefix;
+    File[] files = saveFolder.listFiles( new FilenameFilter(){
+      @Override
+      public boolean accept( File dir, String name )
+      {
+        return name.startsWith( actualPrefix );
+      }
+    } );
+
+    List<String> result = Lists.newArrayList();
+    int toCut = PREFIX.length();
+
+    for( File f : files )
+    {
+      String name = f.getName();
+      result.add( name.substring( toCut, name.length() - 4 ) );
+    }
+
+    return result;
+  }
 }

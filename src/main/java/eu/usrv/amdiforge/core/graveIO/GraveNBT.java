@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -33,7 +31,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.Constants;
 import eu.usrv.amdiforge.AMDIForge;
-import eu.usrv.yamcore.YAMCore;
 import eu.usrv.yamcore.auxiliary.ItemDescriptor;
 import eu.usrv.yamcore.auxiliary.LogHelper;
 

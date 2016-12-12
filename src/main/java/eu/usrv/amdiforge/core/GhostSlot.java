@@ -26,20 +26,20 @@ import net.minecraft.item.ItemStack;
 
 public class GhostSlot extends Slot
 {
-	public GhostSlot( IInventory inv, int index, int xPos, int yPos )
-	{
-		super( inv, index, xPos, yPos );
-	}
+  public GhostSlot( IInventory inv, int index, int xPos, int yPos )
+  {
+    super( inv, index, xPos, yPos );
+  }
 
-	@Override
-	public boolean isItemValid( ItemStack pItemstack )
-	{
-		return false;
-	}
+  @Override
+  public boolean isItemValid( ItemStack pItemstack )
+  {
+    return false;
+  }
 
-	@Override
-	public boolean canTakeStack( EntityPlayer pPlayer )
-	{
-		return false;
-	}
+  @Override
+  public boolean canTakeStack( EntityPlayer pPlayer )
+  {
+    return false;
+  }
 }

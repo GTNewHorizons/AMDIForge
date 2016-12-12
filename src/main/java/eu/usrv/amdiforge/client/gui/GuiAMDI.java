@@ -32,31 +32,31 @@ import eu.usrv.amdiforge.core.ContainerGraveInventory;
 
 public class GuiAMDI extends GuiContainer
 {
-	private float mMouseX;
-	private float mMouseY;
-	private float mGuiMouseX;
-	private float mGuiMouseY;
-	public static int GUI_RowCount = 9;
-	public static int GUI_ColCount = 12;
-	public static int GUI_SizeX = 237;
-	public static int GUI_SizeY = 255;
+  private float mMouseX;
+  private float mMouseY;
+  private float mGuiMouseX;
+  private float mGuiMouseY;
+  public static int GUI_RowCount = 9;
+  public static int GUI_ColCount = 12;
+  public static int GUI_SizeX = 237;
+  public static int GUI_SizeY = 255;
 
-	public GuiAMDI( InventoryPlayer pInventoryPlayer, NBTTagCompound pGraveTag )
-	{
-		super( new ContainerGraveInventory( pInventoryPlayer, pGraveTag ) );
-		xSize = GUI_SizeX;
-		ySize = GUI_SizeY;
+  public GuiAMDI( InventoryPlayer pInventoryPlayer, NBTTagCompound pGraveTag )
+  {
+    super( new ContainerGraveInventory( pInventoryPlayer, pGraveTag ) );
+    xSize = GUI_SizeX;
+    ySize = GUI_SizeY;
 
-		Minecraft mc = Minecraft.getMinecraft();
-	}
-	
-	@Override
-	protected void drawGuiContainerBackgroundLayer( float pPar1, int pPar2, int pPar3 )
-	{
-		GL11.glColor4f( 1.0F, 1.0F, 1.0F, 1.0F );
-		mc.renderEngine.bindTexture( new ResourceLocation( AMDIForge.MODID, "textures/gui/gravefakeintentory.png" ) );
-		int mGuiX = ( width - xSize ) / 2;
-		int mGuiY = ( height - ySize ) / 2;
-		this.drawTexturedModalRect( mGuiX, mGuiY, 0, 0, xSize, ySize );
-	}
+    Minecraft mc = Minecraft.getMinecraft();
+  }
+
+  @Override
+  protected void drawGuiContainerBackgroundLayer( float pPar1, int pPar2, int pPar3 )
+  {
+    GL11.glColor4f( 1.0F, 1.0F, 1.0F, 1.0F );
+    mc.renderEngine.bindTexture( new ResourceLocation( AMDIForge.MODID, "textures/gui/gravefakeintentory.png" ) );
+    int mGuiX = ( width - xSize ) / 2;
+    int mGuiY = ( height - ySize ) / 2;
+    this.drawTexturedModalRect( mGuiX, mGuiY, 0, 0, xSize, ySize );
+  }
 }

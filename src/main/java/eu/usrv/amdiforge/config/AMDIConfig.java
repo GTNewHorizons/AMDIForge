@@ -25,37 +25,37 @@ import eu.usrv.yamcore.config.ConfigManager;
 
 public class AMDIConfig extends ConfigManager
 {
-	public AMDIConfig( File pConfigBaseDirectory, String pModCollectionDirectory, String pModID )
-	{
-		super( pConfigBaseDirectory, pModCollectionDirectory, pModID );
-	}
+  public AMDIConfig( File pConfigBaseDirectory, String pModCollectionDirectory, String pModID )
+  {
+    super( pConfigBaseDirectory, pModCollectionDirectory, pModID );
+  }
 
-	public String MySQL_Server;
-	public String MySQL_DB;
-	public String MySQL_User;
-	public String MySQL_Password;
+  public String MySQL_Server;
+  public String MySQL_DB;
+  public String MySQL_User;
+  public String MySQL_Password;
 
-	@Override
-	protected void PreInit()
-	{
-		MySQL_Server = "";
-		MySQL_DB = "";
-		MySQL_User = "";
-		MySQL_Password = "";
-	}
+  @Override
+  protected void PreInit()
+  {
+    MySQL_Server = "";
+    MySQL_DB = "";
+    MySQL_User = "";
+    MySQL_Password = "";
+  }
 
-	@Override
-	protected void Init()
-	{
-		MySQL_Server = _mainConfig.getString( "MySQL_Server", "MySQL", MySQL_Server, "Your MySQL Server. !!! SET THIS ONLY SERVERSIDE !!!" );
-		MySQL_DB = _mainConfig.getString( "MySQL_DB", "MySQL", MySQL_Server, "Your MySQL Database Name. !!! SET THIS ONLY SERVERSIDE !!!" );
-		MySQL_User = _mainConfig.getString( "MySQL_User", "MySQL", MySQL_Server, "Your MySQL Username. !!! SET THIS ONLY SERVERSIDE !!!" );
-		MySQL_Password = _mainConfig.getString( "MySQL_Password", "MySQL", MySQL_Server, "Your MySQL Password. !!! SET THIS ONLY SERVERSIDE !!!" );
-	}
+  @Override
+  protected void Init()
+  {
+    MySQL_Server = _mainConfig.getString( "MySQL_Server", "MySQL", MySQL_Server, "Your MySQL Server. !!! SET THIS ONLY SERVERSIDE !!!" );
+    MySQL_DB = _mainConfig.getString( "MySQL_DB", "MySQL", MySQL_Server, "Your MySQL Database Name. !!! SET THIS ONLY SERVERSIDE !!!" );
+    MySQL_User = _mainConfig.getString( "MySQL_User", "MySQL", MySQL_Server, "Your MySQL Username. !!! SET THIS ONLY SERVERSIDE !!!" );
+    MySQL_Password = _mainConfig.getString( "MySQL_Password", "MySQL", MySQL_Server, "Your MySQL Password. !!! SET THIS ONLY SERVERSIDE !!!" );
+  }
 
-	@Override
-	protected void PostInit()
-	{
+  @Override
+  protected void PostInit()
+  {
 
-	}
+  }
 }

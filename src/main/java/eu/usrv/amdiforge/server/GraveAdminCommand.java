@@ -46,21 +46,21 @@ import eu.usrv.yamcore.auxiliary.classes.JSONClickEvent;
 import eu.usrv.yamcore.auxiliary.classes.JSONHoverEvent;
 
 
-public class AMDICommand implements ICommand
+public class GraveAdminCommand implements ICommand
 {
   private static final String PREFIX = "inventory-";
   private JSONChatText jsonHelpG = null;
   private JSONChatText jsonHelpGI = null;
   private JSONChatText jsonHelpGTP = null;
   private JSONChatText jsonHelpGP = null;
+  private JSONChatText jsonHelpExp = null;
 
   private List aliases;
 
-  public AMDICommand()
+  public GraveAdminCommand()
   {
-    net.minecraft.block.BlockChest bc = null;
     this.aliases = new ArrayList();
-    this.aliases.add( "amdi" );
+    this.aliases.add( "gadm" );
     populateHelp();
   }
 
@@ -73,13 +73,13 @@ public class AMDICommand implements ICommand
   @Override
   public String getCommandName()
   {
-    return "amdiforge";
+    return "graveadmin";
   }
 
   @Override
   public String getCommandUsage( ICommandSender pCommandSender )
   {
-    return "Type /amdiforge help for more help";
+    return "Type /graveadmin help for more help";
   }
 
   @Override
@@ -117,31 +117,35 @@ public class AMDICommand implements ICommand
       }
       else
       {
-        if( tSubCommand.equalsIgnoreCase( "g" ) )
+        if( tSubCommand.equalsIgnoreCase( "info" ) || tSubCommand.equalsIgnoreCase( "i" ) )
         {
           displayGraveInfo( tEP, tGraveArg, tFullGravePath.getAbsolutePath() );
         }
-        else if( tSubCommand.equalsIgnoreCase( "gi" ) )
+        else if( tSubCommand.equalsIgnoreCase( "show" ) || tSubCommand.equalsIgnoreCase( "s" ) )
         {
           GuiHandler.PendingGraveUIs.put( tEP.getUniqueID().toString(), tFullGravePath.getAbsolutePath() );
 
           AMDIForge.NW.sendTo( new GraveContentDisplayMessage( GraveNBT.loadGraveFile( tFullGravePath.getAbsoluteFile() ) ), (EntityPlayerMP) tEP );
           tEP.openGui( AMDIForge.instance, GuiHandler.GUI_GRAVEVIEW, tEP.worldObj, (int) tEP.posX, (int) tEP.posY, (int) tEP.posZ );
         }
-        else if( tSubCommand.equalsIgnoreCase( "gtp" ) )
+        else if( tSubCommand.equalsIgnoreCase( "teleport" ) || tSubCommand.equalsIgnoreCase( "tp" ) )
         {
           teleportToGrave( tEP, tFullGravePath.getAbsolutePath() );
         }
-        else if( tSubCommand.equalsIgnoreCase( "gravepurge" ) )
+        else if( tSubCommand.equalsIgnoreCase( "delete" ) || tSubCommand.equalsIgnoreCase( "rm" ) )
         {
           if( tFullGravePath.delete() )
             PlayerChatHelper.SendNotifyPositive( tEP, "GraveFile has been deleted" );
           else
             PlayerChatHelper.SendNotifyWarning( tEP, "GraveFile could not be deleted, something went wrong!" );
         }
-        else if( tSubCommand.equalsIgnoreCase( "gexport" ) )
+        else if( tSubCommand.equalsIgnoreCase( "export" ) || tSubCommand.equalsIgnoreCase( "e" ) )
         {
-          exportGraveToChest( tEP, tFullGravePath.getAbsolutePath() );
+          exportGraveToChest( tEP, tFullGravePath.getAbsolutePath(), false );
+        }
+        else if( tSubCommand.equalsIgnoreCase( "forceexport" ) )
+        {
+          exportGraveToChest( tEP, tFullGravePath.getAbsolutePath(), true );
         }
         else
         {
@@ -151,11 +155,35 @@ public class AMDICommand implements ICommand
     }
   }
 
-  private void exportGraveToChest( EntityPlayer pEP, String pFullGravePath )
+  private void exportGraveToChest( EntityPlayer pEP, String pFullGravePath, boolean pForce )
   {
     try
     {
       GraveNBT tGrave = GraveNBT.getGrave( pFullGravePath );
+
+      if( tGrave.getPlacedFlag() != 0 && !pForce )
+      {
+        PlayerChatHelper.SendError( pEP, "Grave has been spawned, according to the GraveFile." );
+        PlayerChatHelper.SendError( pEP, "Make sure the Grave really is not existing and the" );
+        PlayerChatHelper.SendError( pEP, "player is not trying to trick you into duping!" );
+        PlayerChatHelper.SendError( pEP, "If you are sure you want to export a copy of the" );
+        PlayerChatHelper.SendError( pEP, "grave, type" );
+        PlayerChatHelper.SendError( pEP, "   /graveadmin forceexport <gravefile>" );
+
+        return;
+      }
+      else if( tGrave.getPlacedFlag() != 0 && pForce )
+      {
+        List<EntityPlayerMP> tAllPlayers = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
+        for( EntityPlayerMP tPlayer : tAllPlayers )
+        {
+          if( tPlayer.canCommandSenderUseCommand( 1, "" ) )
+          {
+            PlayerChatHelper.SendWarn( tPlayer, "%s just spawned a grave that was reported", pEP.getDisplayName() );
+            PlayerChatHelper.SendWarn( tPlayer, "to exist in-world" );
+          }
+        }
+      }
 
       ItemDescriptor tTargetChest = ItemDescriptor.fromString( "IronChest:BlockIronChest:6", true );
       if( tTargetChest != null )
@@ -208,12 +236,12 @@ public class AMDICommand implements ICommand
         }
         else
         {
-          PlayerChatHelper.SendError( pEP, "Unable to find ObsidianChest in the GameRegistry, chest export not possible" );
+          PlayerChatHelper.SendError( pEP, "Unable to find IronChest in the GameRegistry, chest export not possible" );
         }
       }
       else
       {
-        PlayerChatHelper.SendError( pEP, "Unable to find ObsidianChest in the GameRegistry, chest export not possible" );
+        PlayerChatHelper.SendError( pEP, "Unable to find IronChest in the GameRegistry, chest export not possible" );
       }
     }
     catch( Exception e )
@@ -263,22 +291,22 @@ public class AMDICommand implements ICommand
       JSONChatText tGraveOpen = JSONChatText.simpleMessage( "[Open]" );
       tGraveOpen.Color = EnumChatFormatting.AQUA;
       tGraveOpen.HoverEvent = JSONHoverEvent.SimpleText( "Opens this Grave in the Grave-Inspector" );
-      tGraveOpen.ClickEvent = JSONClickEvent.runCommand( String.format( "/amdi gi %s", pGraveFile ) );
+      tGraveOpen.ClickEvent = JSONClickEvent.runCommand( String.format( "/graveadmin show %s", pGraveFile ) );
 
       JSONChatText tGraveTeleport = JSONChatText.simpleMessage( "[Teleport]" );
       tGraveTeleport.Color = EnumChatFormatting.AQUA;
       tGraveTeleport.HoverEvent = JSONHoverEvent.SimpleText( "Teleports you directly to the recorded spawn-location of this grave" );
-      tGraveTeleport.ClickEvent = JSONClickEvent.runCommand( String.format( "/amdi gtp %s", pGraveFile ) );
+      tGraveTeleport.ClickEvent = JSONClickEvent.runCommand( String.format( "/graveadmin teleport %s", pGraveFile ) );
 
       JSONChatText tGraveExport = JSONChatText.simpleMessage( "[Export]" );
       tGraveExport.Color = EnumChatFormatting.DARK_PURPLE;
       tGraveExport.HoverEvent = JSONHoverEvent.SimpleText( "Exports the grave-contents to a chest spawned at your location" );
-      tGraveExport.ClickEvent = JSONClickEvent.suggestCommand( String.format( "/amdi gexport %s", pGraveFile ) );
+      tGraveExport.ClickEvent = JSONClickEvent.suggestCommand( String.format( "/graveadmin export %s", pGraveFile ) );
 
       JSONChatText tGravePurge = JSONChatText.simpleMessage( "[DELETE]" );
       tGravePurge.Color = EnumChatFormatting.DARK_RED;
       tGravePurge.HoverEvent = JSONHoverEvent.SimpleText( "Deletes the GraveFile from Server.\nThis command will run immediately! Be careful" );
-      tGravePurge.ClickEvent = JSONClickEvent.suggestCommand( String.format( "/amdi gravepurge %s", pGraveFile ) );
+      tGravePurge.ClickEvent = JSONClickEvent.suggestCommand( String.format( "/graveadmin delete %s", pGraveFile ) );
 
       try
       {
@@ -303,11 +331,6 @@ public class AMDICommand implements ICommand
       return true;
   }
 
-  // amdi g - Grave - Shows various information about a grave
-  // amdi gi - GraveInspect - Opens Contents in a GUI
-  // amdi gtp - GraveTeleport - TPs to GraveLocation
-  // amdi gravepurge - GravePurge - Remove GraveFile from disk
-
   private void SendHelpToPlayer( ICommandSender pCmdSender )
   {
     if( !InGame( pCmdSender ) )
@@ -318,7 +341,10 @@ public class AMDICommand implements ICommand
     {
       PlayerChatHelper.SendJsonRaw( (EntityPlayer) pCmdSender, jsonHelpG );
       PlayerChatHelper.SendJsonRaw( (EntityPlayer) pCmdSender, jsonHelpGI );
+      PlayerChatHelper.SendJsonRaw( (EntityPlayer) pCmdSender, jsonHelpGP );
+      PlayerChatHelper.SendJsonRaw( (EntityPlayer) pCmdSender, jsonHelpExp );
       PlayerChatHelper.SendJsonRaw( (EntityPlayer) pCmdSender, jsonHelpGTP );
+      PlayerChatHelper.SendPlain( (EntityPlayer) pCmdSender, "Press [TAB] to auto-complete grave-names" );
     }
   }
 
@@ -327,18 +353,22 @@ public class AMDICommand implements ICommand
     jsonHelpG = new JSONChatText();
     jsonHelpGI = new JSONChatText();
     jsonHelpGP = new JSONChatText();
+    jsonHelpExp = new JSONChatText();
     jsonHelpGTP = new JSONChatText();
 
-    jsonHelpG.Message = "/amdi g <grave file>";
+    jsonHelpG.Message = "/graveadmin [info/i] <grave file>";
     jsonHelpG.HoverEvent = JSONHoverEvent.SimpleText( "Displays various Information about a given Grave-File" );
 
-    jsonHelpGI.Message = "/amdi gi <grave file>";
+    jsonHelpGI.Message = "/graveadmin [show/s] <grave file>";
     jsonHelpGI.HoverEvent = JSONHoverEvent.SimpleText( "Opens the Grave-Inspector GUI\nShows the content of the grave" );
 
-    jsonHelpGP.Message = "/amdi gravepurge <grave file>";
+    jsonHelpGP.Message = "/graveadmin [delete/rm] <grave file>";
     jsonHelpGP.HoverEvent = JSONHoverEvent.SimpleText( "Purge the Grave.\nThis will delete the File, be careful!" );
 
-    jsonHelpGTP.Message = "/amdi gtp <grave file>";
+    jsonHelpExp.Message = "/graveadmin [export/e] <grave file>";
+    jsonHelpExp.HoverEvent = JSONHoverEvent.SimpleText( "Exports the Items in given grave in a chest\nthat will be spawned in front of you" );
+
+    jsonHelpGTP.Message = "/graveadmin [teleport/tp] <grave file>";
     jsonHelpGTP.HoverEvent = JSONHoverEvent.SimpleText( "Teleport to Grave Location\nTeleports you to the Location the Grave was spawned\nMake sure you are in creative, to avoid surprises..." );
   }
 
