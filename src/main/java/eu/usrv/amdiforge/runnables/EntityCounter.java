@@ -8,9 +8,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import eu.usrv.amdiforge.AMDIForge;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 
@@ -20,10 +20,12 @@ public class EntityCounter implements Runnable
   {
     public String EntityClassName;
     public List<WorldDef> WorldList;
+    public int EntityID;
 
-    public EntityDef( String pClassName )
+    public EntityDef( Entity pEntity )
     {
-      EntityClassName = pClassName;
+      EntityID = pEntity.getEntityId();
+      EntityClassName = pEntity.getClass().getCanonicalName();
       WorldList = new ArrayList<WorldDef>();
     }
   }
@@ -97,10 +99,11 @@ public class EntityCounter implements Runnable
       for( int j = 0; j < ws.loadedEntityList.size(); ++j )
       {
         Entity entity = (Entity) ws.loadedEntityList.get( j );
-        
+
         String tCanonicalName = entity.getClass().getCanonicalName();
-        AMDIForge.Logger.info( String.format("Found living entity %s in world %d", tCanonicalName, ws.provider.dimensionId ));
-        
+        // AMDIForge.Logger.info( String.format("Found living entity %s in world %d", tCanonicalName,
+        // ws.provider.dimensionId ));
+
         boolean tFoundEntity = false;
         for( EntityDef tEntity : tEntities )
         {
@@ -121,7 +124,7 @@ public class EntityCounter implements Runnable
           }
         }
         if( !tFoundEntity )
-          tEntities.add( new EntityDef( tCanonicalName ) );
+          tEntities.add( new EntityDef( entity ) );
       }
     }
 
@@ -129,6 +132,42 @@ public class EntityCounter implements Runnable
     try
     {
       _mEntities = tEntities;
+    }
+    finally
+    {
+      _mLock.writeLock().unlock();
+    }
+  }
+
+  public void trackSpawnEvent( World pTargetWorld, Entity pEntityToSpawn )
+  {
+    String tCanonicalName = pEntityToSpawn.getClass().getCanonicalName();
+    int tTargetWorld = pTargetWorld.provider.dimensionId;
+    
+    _mLock.writeLock().lock();
+    try
+    {
+      boolean tFoundEntity = false;
+      for( EntityDef tEntity : _mEntities )
+      {
+        if( tEntity.EntityClassName.equalsIgnoreCase( tCanonicalName ) )
+        {
+          boolean tFoundWorld = false;
+          for( WorldDef tWorld : tEntity.WorldList )
+          {
+            if( tWorld.DimensionID == tTargetWorld )
+            {
+              tFoundWorld = true;
+              tWorld.EntityCount += 1;
+            }
+
+            if( !tFoundWorld )
+              tEntity.WorldList.add( new WorldDef( tTargetWorld, 1 ) );
+          }
+        }
+      }
+      if( !tFoundEntity )
+        _mEntities.add( new EntityDef( pEntityToSpawn ) );
     }
     finally
     {

@@ -139,6 +139,8 @@ public class LivingCheckSpawnEventHandler
     Entity tEntityToSpawn = pEvent.entity;
 
     pEvent.setResult( getEventResult( tTargetWorld, tEntityToSpawn ) );
+    if( pEvent.getResult() == Result.ALLOW ) // Increase
+      EntityCounter.getInstance().trackSpawnEvent( tTargetWorld, tEntityToSpawn );
   }
 
   private Event.Result getEventResult( World pWorld, Entity pEntity )
@@ -150,7 +152,7 @@ public class LivingCheckSpawnEventHandler
 
     String tDebugResultTemplate = "[SPAWNLIMITER] Spawn %s. Reason: %s";
     String tResult = "-";
-    
+
     List<SpawnLimitWorld> tWorldList = null;
     SpawnLimitWorld tTargetWorld = null;
     boolean tGlobalWhitelisted = false;
@@ -180,9 +182,12 @@ public class LivingCheckSpawnEventHandler
     if( tWorldList == null )
     {
       // Entity not found. Create an entry for it
-      _mLogger.info( String.format( "Unknown Entity spawn detected: [%s] adding to config file", tEntityClassName ) );
-      _mSLC.getEntityList().add( _mSLCF.createLimitedEntity( pEntity.getClass() ) );
-      SaveSpawnLimits();
+      if( AMDIForge.AMDICfg.TraceAndExportUnknownEntities )
+      {
+        _mLogger.info( String.format( "Unknown Entity spawn detected: [%s] adding to config file", tEntityClassName ) );
+        _mSLC.getEntityList().add( _mSLCF.createLimitedEntity( pEntity.getClass() ) );
+        SaveSpawnLimits();
+      }
     }
 
     if( tGlobalWhitelisted )
@@ -228,10 +233,13 @@ public class LivingCheckSpawnEventHandler
       }
     }
 
-    if (tReturn != Result.DEFAULT)
+    if( tReturn != Result.DEFAULT )
     {
-      _mLogger.info( String.format( "[SPAWNLIMITER] Attempt to spawn an instance of [%s] in World [%d]", tEntityClassName, tDimensionID ) );
-      _mLogger.info( String.format( tDebugResultTemplate, tReturn.toString(), tResult ) );
+      if( ( tReturn == Result.ALLOW && AMDIForge.AMDICfg.SpawnEventReportLevel == 2 ) || ( tReturn == Result.DENY && AMDIForge.AMDICfg.SpawnEventReportLevel >= 1 ) )
+      {
+        _mLogger.info( String.format( "[SPAWNLIMITER] Attempt to spawn an instance of [%s] in World [%d]", tEntityClassName, tDimensionID ) );
+        _mLogger.info( String.format( tDebugResultTemplate, tReturn.toString(), tResult ) );
+      }
     }
     return tReturn;
   }

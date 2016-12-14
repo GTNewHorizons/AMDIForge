@@ -34,6 +34,8 @@ public class AMDIConfig extends ConfigManager
   public String MySQL_DB;
   public String MySQL_User;
   public String MySQL_Password;
+  public boolean TraceAndExportUnknownEntities;
+  public int SpawnEventReportLevel;
 
   @Override
   protected void PreInit()
@@ -42,6 +44,8 @@ public class AMDIConfig extends ConfigManager
     MySQL_DB = "";
     MySQL_User = "";
     MySQL_Password = "";
+    TraceAndExportUnknownEntities = false;
+    SpawnEventReportLevel = 0;
   }
 
   @Override
@@ -51,6 +55,8 @@ public class AMDIConfig extends ConfigManager
     MySQL_DB = _mainConfig.getString( "MySQL_DB", "MySQL", MySQL_Server, "Your MySQL Database Name. !!! SET THIS ONLY SERVERSIDE !!!" );
     MySQL_User = _mainConfig.getString( "MySQL_User", "MySQL", MySQL_Server, "Your MySQL Username. !!! SET THIS ONLY SERVERSIDE !!!" );
     MySQL_Password = _mainConfig.getString( "MySQL_Password", "MySQL", MySQL_Server, "Your MySQL Password. !!! SET THIS ONLY SERVERSIDE !!!" );
+    TraceAndExportUnknownEntities = _mainConfig.getBoolean( "TraceAndExportUnknownEntities", "SpawnLimiter", TraceAndExportUnknownEntities, "If set to true, yet unknown entities that spawn will be added to the config file with an empty world-set" );
+    SpawnEventReportLevel = _mainConfig.getInt( "SpawnEventReportLevel", "SpawnLimiter", 0, 2, SpawnEventReportLevel, "0: Disabled 1: Report Blocked only 2: Report Blocked and allowed" );
   }
 
   @Override
