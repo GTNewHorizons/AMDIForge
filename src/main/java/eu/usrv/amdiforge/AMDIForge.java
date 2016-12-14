@@ -20,6 +20,8 @@ package eu.usrv.amdiforge;
 
 import java.util.Random;
 
+import net.minecraftforge.common.MinecraftForge;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -31,8 +33,10 @@ import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import eu.usrv.amdiforge.config.AMDIConfig;
 import eu.usrv.amdiforge.core.GraveFileHandler;
+import eu.usrv.amdiforge.events.LivingCheckSpawnEventHandler;
 import eu.usrv.amdiforge.net.AMDIDispatcher;
 import eu.usrv.amdiforge.proxy.CommonProxy;
+import eu.usrv.amdiforge.runnables.RunnableManager;
 import eu.usrv.amdiforge.server.GraveAdminCommand;
 import eu.usrv.yamcore.auxiliary.IngameErrorLog;
 import eu.usrv.yamcore.auxiliary.LogHelper;
@@ -51,7 +55,10 @@ public class AMDIForge
   public static LogHelper Logger = new LogHelper( MODID );
   public static Random Rnd = null;
   public static AMDIDispatcher NW;
-
+  public static LivingCheckSpawnEventHandler SpawnLimiter = null;
+  
+  private static RunnableManager _RM = null;
+  
   @SidedProxy( clientSide = "eu.usrv.amdiforge.proxy.ClientProxy", serverSide = "eu.usrv.amdiforge.proxy.CommonProxy" )
   public static CommonProxy proxy;
 
@@ -67,15 +74,18 @@ public class AMDIForge
       Logger.error( String.format( "%s could not load its config file. Things are going to be weird!", MODID ) );
 
     AdminLogonErrors = new IngameErrorLog();
-
+    SpawnLimiter = new LivingCheckSpawnEventHandler( this, pEvent.getModConfigurationDirectory() );
+    
     NW = new AMDIDispatcher();
     NW.registerPackets();
   }
 
   @EventHandler
-  public void init( FMLInitializationEvent event )
+  public void init( FMLInitializationEvent pEvent )
   {
     FMLCommonHandler.instance().bus().register( AdminLogonErrors );
+    
+    MinecraftForge.EVENT_BUS.register( SpawnLimiter );
     NetworkRegistry.INSTANCE.registerGuiHandler( this, new GuiHandler() );
   }
 
@@ -88,6 +98,7 @@ public class AMDIForge
   public void serverLoad( FMLServerStartingEvent pEvent )
   {
     pEvent.registerServerCommand( new GraveAdminCommand() );
+    _RM = RunnableManager.getInstance();
   }
 
 }
