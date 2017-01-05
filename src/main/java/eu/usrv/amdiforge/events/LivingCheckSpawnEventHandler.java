@@ -233,13 +233,10 @@ public class LivingCheckSpawnEventHandler
       }
     }
 
-    if( tReturn != Result.DEFAULT )
+    if (tReturn != Result.DEFAULT && AMDIForge.AMDICfg.DoDebugMessages)
     {
-      if( ( tReturn == Result.ALLOW && AMDIForge.AMDICfg.SpawnEventReportLevel == 2 ) || ( tReturn == Result.DENY && AMDIForge.AMDICfg.SpawnEventReportLevel >= 1 ) )
-      {
-        _mLogger.info( String.format( "[SPAWNLIMITER] Attempt to spawn an instance of [%s] in World [%d]", tEntityClassName, tDimensionID ) );
-        _mLogger.info( String.format( tDebugResultTemplate, tReturn.toString(), tResult ) );
-      }
+      _mLogger.info( String.format( "[SPAWNLIMITER] Attempt to spawn an instance of [%s] in World [%d]", tEntityClassName, tDimensionID ) );
+      _mLogger.info( String.format( tDebugResultTemplate, tReturn.toString(), tResult ) );
     }
     return tReturn;
   }

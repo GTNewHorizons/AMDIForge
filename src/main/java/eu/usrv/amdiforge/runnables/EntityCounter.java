@@ -101,9 +101,9 @@ public class EntityCounter implements Runnable
         Entity entity = (Entity) ws.loadedEntityList.get( j );
 
         String tCanonicalName = entity.getClass().getCanonicalName();
-        // AMDIForge.Logger.info( String.format("Found living entity %s in world %d", tCanonicalName,
-        // ws.provider.dimensionId ));
-
+        if (AMDIForge.AMDICfg.DoDebugMessages)
+          AMDIForge.Logger.info( String.format("Found living entity %s in world %d", tCanonicalName, ws.provider.dimensionId ));
+        
         boolean tFoundEntity = false;
         for( EntityDef tEntity : tEntities )
         {
