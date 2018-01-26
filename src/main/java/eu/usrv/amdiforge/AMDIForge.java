@@ -18,8 +18,12 @@
 package eu.usrv.amdiforge;
 
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Random;
 
+import eu.usrv.amdiforge.database.MySQL;
+import eu.usrv.amdiforge.server.GraveLookupRequestCommand;
 import net.minecraftforge.common.MinecraftForge;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -58,7 +62,27 @@ public class AMDIForge
   public static LivingCheckSpawnEventHandler SpawnLimiter = null;
   
   private static RunnableManager _RM = null;
-  
+
+
+  private static MySQL mSQL = null;
+  private Connection mCon = null;
+
+  public Connection getConnection()
+  {
+    try{
+      if(!mSQL.checkConnection() || mCon == null)
+        mCon = mSQL.openConnection();
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+
+    return mCon;
+  }
+
+
   @SidedProxy( clientSide = "eu.usrv.amdiforge.proxy.ClientProxy", serverSide = "eu.usrv.amdiforge.proxy.CommonProxy" )
   public static CommonProxy proxy;
 
@@ -78,6 +102,14 @@ public class AMDIForge
     
     NW = new AMDIDispatcher();
     NW.registerPackets();
+
+
+    mSQL = new MySQL(AMDICfg.MySQL_Server, "3306", AMDICfg.MySQL_DB, AMDICfg.MySQL_User, AMDICfg.MySQL_Password);
+    try {
+      mCon = mSQL.openConnection();
+    } catch (ClassNotFoundException | SQLException e) {
+      e.printStackTrace();
+    }
   }
 
   @EventHandler
@@ -98,6 +130,7 @@ public class AMDIForge
   public void serverLoad( FMLServerStartingEvent pEvent )
   {
     pEvent.registerServerCommand( new GraveAdminCommand() );
+    pEvent.registerServerCommand( new GraveLookupRequestCommand() );
     _RM = RunnableManager.getInstance();
   }
 

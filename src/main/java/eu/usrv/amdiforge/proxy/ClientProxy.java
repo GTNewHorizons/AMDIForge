@@ -37,4 +37,10 @@ public class ClientProxy extends CommonProxy
 	{
 		return FMLClientHandler.instance().getClient().theWorld;
 	}
+
+	@Override
+	public boolean getServerSide()
+	{
+		return false;
+	}
 }
