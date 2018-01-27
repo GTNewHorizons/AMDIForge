@@ -36,6 +36,8 @@ public class AMDIConfig extends ConfigManager
   public String MySQL_Password;
   public boolean TraceAndExportUnknownEntities;
   public int SpawnEventReportLevel;
+  public boolean EnableGraveHelpCommand;
+  public boolean EnableGraveAdminCommand;
 
   @Override
   protected void PreInit()
@@ -57,6 +59,8 @@ public class AMDIConfig extends ConfigManager
     MySQL_Password = _mainConfig.getString( "MySQL_Password", "MySQL", MySQL_Server, "Your MySQL Password. !!! SET THIS ONLY SERVERSIDE !!!" );
     TraceAndExportUnknownEntities = _mainConfig.getBoolean( "TraceAndExportUnknownEntities", "SpawnLimiter", TraceAndExportUnknownEntities, "If set to true, yet unknown entities that spawn will be added to the config file with an empty world-set" );
     SpawnEventReportLevel = _mainConfig.getInt( "SpawnEventReportLevel", "SpawnLimiter", 0, 2, SpawnEventReportLevel, "0: Disabled 1: Report Blocked only 2: Report Blocked and allowed" );
+    EnableGraveHelpCommand = _mainConfig.getBoolean( "EnableGraveHelpCommand", "Modules", false,"Set to true to enable the /gravehelp request command to provide users with a lookup code" );
+    EnableGraveAdminCommand = _mainConfig.getBoolean( "EnableGraveAdminCommand", "Modules", false, "Set to true to enable the /graveadmin command for Operators, to work with GraveFiles" );
   }
 
   @Override

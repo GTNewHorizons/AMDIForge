@@ -74,7 +74,7 @@ public class GraveLookupRequestCommand implements ICommand
           ps.setString( 3, tEP.getDisplayName() );
           ps.executeUpdate();
 
-          PlayerChatHelper.SendInfo( tEP, String.format( "Your Code is: %s It is valid for 10 Minutes" ) );
+          PlayerChatHelper.SendInfo( tEP, String.format( "Your Code is: %s It is valid for 10 Minutes", accessCode ) );
         }
         catch( SQLException e1 )
         {

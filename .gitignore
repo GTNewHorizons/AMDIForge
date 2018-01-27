@@ -8,3 +8,9 @@ eclipse/
 /gradlew.bat
 *.bat
 .idea/
+AMDIForge_main.iml
+AMDIForge_api.iml
+AMDIForge.iws
+AMDIForge.ipr
+AMDIForge_test.iml
+AMDIForge.iml

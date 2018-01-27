@@ -129,8 +129,10 @@ public class AMDIForge
   @EventHandler
   public void serverLoad( FMLServerStartingEvent pEvent )
   {
-    pEvent.registerServerCommand( new GraveAdminCommand() );
-    pEvent.registerServerCommand( new GraveLookupRequestCommand() );
+    if (AMDICfg.EnableGraveAdminCommand)
+      pEvent.registerServerCommand( new GraveAdminCommand() );
+    if (AMDICfg.EnableGraveHelpCommand)
+      pEvent.registerServerCommand( new GraveLookupRequestCommand() );
     _RM = RunnableManager.getInstance();
   }
 
