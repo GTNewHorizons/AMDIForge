@@ -42,7 +42,7 @@ minecraft {
 repositories {
     maven { // GalacticGreg, YAMCore,..
         name 'UsrvDE'
-        url "http://jenkins.usrv.de:8082/nexus/content/repositories/releases/"
+        url "http://jenkins.usrv.eu:8081/nexus/content/repositories/releases/"
     }
 }
 

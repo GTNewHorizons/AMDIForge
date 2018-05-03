@@ -5,7 +5,6 @@ bin/
 build/
 eclipse/
 .gradle/
-/gradlew.bat
 *.bat
 .idea/
 AMDIForge_main.iml
