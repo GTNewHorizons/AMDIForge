@@ -135,12 +135,17 @@ public class LivingCheckSpawnEventHandler
     if( !( pEvent.entityLiving instanceof EntityLiving ) )
       return;
 
-    World tTargetWorld = pEvent.world;
-    Entity tEntityToSpawn = pEvent.entity;
-
-    pEvent.setResult( getEventResult( tTargetWorld, tEntityToSpawn ) );
-    if( pEvent.getResult() == Result.ALLOW ) // Increase
-      EntityCounter.getInstance().trackSpawnEvent( tTargetWorld, tEntityToSpawn );
+    Result oldResult = pEvent.getResult();
+    // We check if the result wasn't changed at all,
+    //   and change only if it was not changed
+    if(oldResult == Result.DEFAULT) {
+      Result result = getEventResult(pEvent.world, pEvent.entity);
+      if (result != oldResult) {
+        pEvent.setResult(result);
+        if (result == Result.ALLOW) // Increase
+          EntityCounter.getInstance().trackSpawnEvent(pEvent.world, pEvent.entity);
+      }
+    }
   }
 
   private Event.Result getEventResult( World pWorld, Entity pEntity )
