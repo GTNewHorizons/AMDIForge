@@ -5,8 +5,6 @@ package eu.usrv.amdiforge.events;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -137,15 +135,15 @@ public class LivingCheckSpawnEventHandler
 
     World tTargetWorld = pEvent.world;
     Entity tEntityToSpawn = pEvent.entity;
-
-    pEvent.setResult( getEventResult( tTargetWorld, tEntityToSpawn ) );
+  
+    pEvent.setResult( getEventResult( tTargetWorld, tEntityToSpawn, pEvent.getResult() ) );
     if( pEvent.getResult() == Result.ALLOW ) // Increase
       EntityCounter.getInstance().trackSpawnEvent( tTargetWorld, tEntityToSpawn );
   }
 
-  private Event.Result getEventResult( World pWorld, Entity pEntity )
+  private Event.Result getEventResult( World pWorld, Entity pEntity, Event.Result pCurrentEventResult )
   {
-    Event.Result tReturn = Result.DEFAULT;
+    Event.Result tReturn = pCurrentEventResult;
 
     String tEntityClassName = pEntity.getClass().getCanonicalName();
     int tDimensionID = pWorld.provider.dimensionId;
@@ -157,8 +155,10 @@ public class LivingCheckSpawnEventHandler
     SpawnLimitWorld tTargetWorld = null;
     boolean tGlobalWhitelisted = false;
 
+    // Check if entity is known already
     for( LimitedEntity tEntity : _mSLC.getEntityList() )
     {
+      // Exact name match
       if( tEntity.matchNameExact() )
       {
         if( tEntityClassName.equalsIgnoreCase( tEntity.getClassName() ) )
@@ -170,7 +170,8 @@ public class LivingCheckSpawnEventHandler
       }
       else
       {
-        if( tEntityClassName.toLowerCase().contains( tEntityClassName.toLowerCase() ) )
+        // Part name-match; "Skeleton" matches all entities with Skeleton in their classname
+        if( tEntityClassName.toLowerCase().contains( tEntity.getClassName().toLowerCase() ) )
         {
           tWorldList = tEntity.getWorldConfig();
           tGlobalWhitelisted = tEntity.getGlobalWhitelisted();
@@ -190,11 +191,13 @@ public class LivingCheckSpawnEventHandler
       }
     }
 
+    // If we have a global whitelist (Global force to spawn), set result to allow
     if( tGlobalWhitelisted )
     {
       tResult = "Spawn allowed; Global-Whitelisted";
       tReturn = Result.ALLOW;
     }
+    // No global whitelist. Check dimensions defined
     else
     {
       if( tWorldList != null )
@@ -209,8 +212,10 @@ public class LivingCheckSpawnEventHandler
         }
       }
 
+      // There is an entry for a dimension
       if( tTargetWorld != null )
       {
+        // Whitelisted in this dimension? (Forced Spawn)
         if( tTargetWorld.getWhitelisted() )
         {
           tResult = "Spawn allowed; World-Whitelisted";
@@ -218,19 +223,17 @@ public class LivingCheckSpawnEventHandler
         }
         else
         {
+          // Check number of entities already alive and deny if it exceeds the maximum number defined
           int tActiveEntities = EntityCounter.getInstance().getEntityCountForWorld( tEntityClassName, tTargetWorld.getDimID() );
           if( tActiveEntities >= tTargetWorld.getMaxSpawn() )
           {
             tResult = "Spawn denied; Max-Entities reached";
             tReturn = Result.DENY;
           }
-          else
-          {
-            tResult = "Spawn allowed";
-            tReturn = Result.ALLOW;
-          }
+          // Else: Do nothing
         }
       }
+      // Else: No World defined, do nothing
     }
 
     if (tReturn != Result.DEFAULT && AMDIForge.AMDICfg.DoDebugMessages)
@@ -238,6 +241,9 @@ public class LivingCheckSpawnEventHandler
       _mLogger.info( String.format( "[SPAWNLIMITER] Attempt to spawn an instance of [%s] in World [%d]", tEntityClassName, tDimensionID ) );
       _mLogger.info( String.format( tDebugResultTemplate, tReturn.toString(), tResult ) );
     }
+    
+    // Now returns the previous Eventstate for this entity, instead of DEFAULT, which re-allowed all entities blocked by Magnumtorch
+    // and all other mob-spawn-limiting blocks
     return tReturn;
   }
 }
