@@ -24,7 +24,6 @@ import java.util.Random;
 
 import eu.usrv.amdiforge.database.MySQL;
 import eu.usrv.amdiforge.server.GraveLookupRequestCommand;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.common.MinecraftForge;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -74,9 +73,7 @@ public class AMDIForge
       if(!mSQL.checkConnection() || mCon == null)
         mCon = mSQL.openConnection();
 
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
+    } catch (SQLException | ClassNotFoundException e) {
       e.printStackTrace();
     }
 
@@ -104,14 +101,13 @@ public class AMDIForge
     NW = new AMDIDispatcher();
     NW.registerPackets();
 
-
     mSQL = new MySQL(AMDICfg.MySQL_Server, "3306", AMDICfg.MySQL_DB, AMDICfg.MySQL_User, AMDICfg.MySQL_Password);
     try {
       mCon = mSQL.openConnection();
     } catch (ClassNotFoundException | SQLException e) {
       e.printStackTrace();
-      Logger.error("No MYSQL server could be reached! You probably want to remove AMDIForge.jar unless you use it.");
-      FMLCommonHandler.instance().exitJava(-99, false);
+      Logger.error("No MYSQL server could be reached! You probably want to remove the AMDIForge jar unless you use it.");
+      //FMLCommonHandler.instance().exitJava(-99, false);
     }
   }
 
