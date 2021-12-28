@@ -73,9 +73,7 @@ public class AMDIForge
       if(!mSQL.checkConnection() || mCon == null)
         mCon = mSQL.openConnection();
 
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
+    } catch (SQLException | ClassNotFoundException e) {
       e.printStackTrace();
     }
 
@@ -103,12 +101,15 @@ public class AMDIForge
     NW = new AMDIDispatcher();
     NW.registerPackets();
 
-
-    mSQL = new MySQL(AMDICfg.MySQL_Server, "3306", AMDICfg.MySQL_DB, AMDICfg.MySQL_User, AMDICfg.MySQL_Password);
-    try {
-      mCon = mSQL.openConnection();
-    } catch (ClassNotFoundException | SQLException e) {
-      e.printStackTrace();
+    if (AMDICfg.UseMySQL) {
+      mSQL = new MySQL(AMDICfg.MySQL_Server, "3306", AMDICfg.MySQL_DB, AMDICfg.MySQL_User, AMDICfg.MySQL_Password);
+      try {
+        mCon = mSQL.openConnection();
+      } catch (ClassNotFoundException | SQLException e) {
+        e.printStackTrace();
+        Logger.error( String.format("No MYSQL server could be reached! Set UseMySQL to false or remove the %s jar file.", MODID) );
+        FMLCommonHandler.instance().exitJava(-99, false);
+      }
     }
   }
 

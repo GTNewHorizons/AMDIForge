@@ -124,6 +124,7 @@ public class LivingCheckSpawnEventHandler
     }
   }
 
+  /** Called by Forge - return ALLOW, DENY, or DEFAULT to control spawning in our world.*/
   @SubscribeEvent( receiveCanceled = false, priority = EventPriority.LOWEST )
   public void checkSpawnEvent( CheckSpawn pEvent )
   {
@@ -132,6 +133,9 @@ public class LivingCheckSpawnEventHandler
 
     if( !( pEvent.entityLiving instanceof EntityLiving ) )
       return;
+
+    if( pEvent.getResult() == Result.DENY )
+      return; // BAIL!  Someone else already said to deny that shit, so don't allow it
 
     World tTargetWorld = pEvent.world;
     Entity tEntityToSpawn = pEvent.entity;
