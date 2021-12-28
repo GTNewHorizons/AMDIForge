@@ -30,6 +30,7 @@ public class AMDIConfig extends ConfigManager
     super( pConfigBaseDirectory, pModCollectionDirectory, pModID );
   }
 
+  public boolean UseMySQL;
   public String MySQL_Server;
   public String MySQL_DB;
   public String MySQL_User;
@@ -42,6 +43,7 @@ public class AMDIConfig extends ConfigManager
   @Override
   protected void PreInit()
   {
+    UseMySQL = true;
     MySQL_Server = "";
     MySQL_DB = "";
     MySQL_User = "";
@@ -53,6 +55,7 @@ public class AMDIConfig extends ConfigManager
   @Override
   protected void Init()
   {
+    UseMySQL = _mainConfig.getBoolean( "UseMySQL", "MySQL", UseMySQL, "Set false to skip using MySQL. Set this on true on server.");
     MySQL_Server = _mainConfig.getString( "MySQL_Server", "MySQL", MySQL_Server, "Your MySQL Server. !!! SET THIS ONLY SERVERSIDE !!!" );
     MySQL_DB = _mainConfig.getString( "MySQL_DB", "MySQL", MySQL_Server, "Your MySQL Database Name. !!! SET THIS ONLY SERVERSIDE !!!" );
     MySQL_User = _mainConfig.getString( "MySQL_User", "MySQL", MySQL_Server, "Your MySQL Username. !!! SET THIS ONLY SERVERSIDE !!!" );
