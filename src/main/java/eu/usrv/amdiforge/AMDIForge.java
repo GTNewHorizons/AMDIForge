@@ -108,7 +108,7 @@ public class AMDIForge
       } catch (ClassNotFoundException | SQLException e) {
         e.printStackTrace();
         Logger.error( String.format("No MYSQL server could be reached! Set UseMySQL to false or remove the %s jar file.", MODID) );
-        FMLCommonHandler.instance().exitJava(-99, false);
+        FMLCommonHandler.instance().exitJava(-97, false);
       }
     }
   }
