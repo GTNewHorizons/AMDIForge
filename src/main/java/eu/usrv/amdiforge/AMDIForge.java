@@ -25,6 +25,7 @@ import java.util.Random;
 import eu.usrv.amdiforge.database.MySQL;
 import eu.usrv.amdiforge.server.GraveLookupRequestCommand;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.launchwrapper.Launch;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -90,6 +91,7 @@ public class AMDIForge
   @EventHandler
   public void PreInit( FMLPreInitializationEvent pEvent )
   {
+    final boolean isDevelopmentEnvironment = (boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment");
     Rnd = new Random( System.currentTimeMillis() );
     AMDICfg = new AMDIConfig( pEvent.getModConfigurationDirectory(), NICEFOLDERNAME, MODID );
     if( !AMDICfg.LoadConfig() )
@@ -107,8 +109,10 @@ public class AMDIForge
         mCon = mSQL.openConnection();
       } catch (ClassNotFoundException | SQLException e) {
         e.printStackTrace();
-        Logger.error( String.format("No MYSQL server could be reached! Set UseMySQL to false or remove the %s jar file.", MODID) );
-        FMLCommonHandler.instance().exitJava(-97, false);
+        Logger.error( String.format("No MYSQL server could be reached! Set UseMySQL to false or remove the AMDIForce jar file.") );
+        if (!isDevelopmentEnvironment) {
+          FMLCommonHandler.instance().exitJava(-97, false);
+        }
       }
     }
   }

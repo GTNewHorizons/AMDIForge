@@ -1,10 +1,10 @@
 [
 {
-  "modid": "amdiforge",
-  "name": "A.M.D.I Forge",
+  "modid": "${modId}",
+  "name": "${modName}",
   "description": "Forge Frontend for the AMDI ServerScript",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "version": "${modVersion}",
+  "mcversion": "${minecraftVersion}",
   "url": "https://github.com/GTNewHorizons/AMDIForge",
   "updateUrl": "",
   "authorList": ["Namikon"],
